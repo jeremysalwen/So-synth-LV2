@@ -1,0 +1,15 @@
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix extport: <http://lv2plug.in/ns/dev/extportinfo#> .
+<urn:50m30n3:plugins:SO-666> a lv2:Plugin ;
+    doap:name "SO-666 Synthesizer" ;
+    doap:licence <http://usefulinc.com/doap/licenses/gpl> ;
+
+    lv2:port [
+    a lv2:AudioPort ;
+    a lv2:OutputPort ;
+    lv2:index 1 ;
+    lv2:symbol "output" ;
+    lv2:name "Output" ;
+    ] .
