@@ -1,8 +1,4 @@
-
 #include "so-666.h"
-int done;
-
-
 
 double dist( double in )
 {
@@ -16,69 +12,19 @@ double dist( double in )
 static void runSO_666( LV2_Handle arg, uint32_t nframes )
 {
 	so_666* so=(so_666*)arg;
+	
+	double **strings=so->strings;
+	unsigned int* stringpos=so->stringpos;
+	unsigned int* stringlength=so->stringlength;
 	float* outbuffer=so->output;
+	int * status=so->status;
 
 	int i, note;
 	double  sample, damp;
 
 	for( i=0; i<nframes; i++ )
 	{
-		sample = (((double)rand()/(double)RAND_MAX)*2.0-1.0)*0.001;
-
-		for( note=0; note<NUMNOTES; note++ )
-		{
-			damp = stringcutoff[note];
-
-			if( stringpos[note] > 0 )
-				strings[note][stringpos[note]] = strings[note][stringpos[note]]*damp +
-				strings[note][stringpos[note]-1]*(1.0-damp);
-			else
-				strings[note][stringpos[note]] = strings[note][stringpos[note]]*damp +
-				strings[note][stringlength[note]-1]*(1.0-damp);
-
-			strings[note][stringpos[note]] = dist( strings[note][stringpos[note]] ) * 0.99;
-
-			sample += strings[note][stringpos[note]];
-		}
-
-		hpval += (sample-hplast) * 0.0001;
-		hplast += hpval;
-		hpval *= 0.96;
-		sample -= hplast;
-
-		lpval += (sample-lplast) * fcutoff * (1.0-tanh(lplast)*tanh(lplast)*0.9);
-		lplast += lpval;
-		lpval *= freso;
-		sample = lplast;
-
-		for( note=0; note<NUMNOTES; note++ )
-		{
-			if( status[note] > 0 )
-			{
-				strings[note][stringpos[note]] += sample*ffeedback;
-			}
-
-			if( fabs( strings[note][stringpos[note]] ) <= 0.0001 )
-				strings[note][stringpos[note]] = 0.0;
-
-			stringpos[note]++;
-			if( stringpos[note] >= stringlength[note] ) stringpos[note] = 0;
-		}
-
-		outbuffer[i] = dist( sample ) * (volume/127.0);
-	}
-
-}
-
-int main( int argc, char *argv[] )
-{
-
-
-	while( ! done )
-	{
-		if( poll( pfd, npfd, 100000 ) > 0 )
-		{
-			do
+	do
 			{
 				snd_seq_event_input( seqport, &midievent );
 
@@ -135,6 +81,63 @@ int main( int argc, char *argv[] )
 				snd_seq_free_event( midievent );
 			}
 			while( snd_seq_event_input_pending( seqport, 0 ) > 0 );
+			
+		sample = (((double)rand()/(double)RAND_MAX)*2.0-1.0)*0.001;
+
+		for( note=0; note<NUMNOTES; note++ )
+		{
+			damp = so->stringcutoff[note];
+
+			if( stringpos[note] > 0 )
+				strings[note][stringpos[note]] = strings[note][stringpos[note]]*damp +
+				strings[note][stringpos[note]-1]*(1.0-damp);
+			else
+				strings[note][stringpos[note]] = strings[note][stringpos[note]]*damp +
+				strings[note][stringlength[note]-1]*(1.0-damp);
+
+			strings[note][stringpos[note]] = dist( strings[note][stringpos[note]] ) * 0.99;
+
+			sample += strings[note][stringpos[note]];
+		}
+
+		so->hpval += (sample-so->hplast) * 0.0001;
+		so->hplast += so->hpval;
+		so->hpval *= 0.96;
+		sample -= so->hplast;
+
+		so->lpval += (sample-so->lplast) * so->fcutoff * (1.0-tanh(so->lplast)*tanh(so->lplast)*0.9);
+		so->lplast +=so-> lpval;
+		so->lpval *= so->freso;
+		sample = so->lplast;
+
+		for( note=0; note<NUMNOTES; note++ )
+		{
+			if( status[note] > 0 )
+			{
+				strings[note][stringpos[note]] += sample*so->ffeedback;
+			}
+
+			if( fabs( strings[note][stringpos[note]] ) <= 0.0001 )
+				strings[note][stringpos[note]] = 0.0;
+
+			stringpos[note]++;
+			if( stringpos[note] >= stringlength[note] ) stringpos[note] = 0;
+		}
+
+		outbuffer[i] = dist( sample ) * (so->volume/127.0);
+	}
+
+}
+
+int main( int argc, char *argv[] )
+{
+
+
+	while( ! done )
+	{
+		if( poll( pfd, npfd, 100000 ) > 0 )
+		{
+			
 		}
 	}
 
@@ -176,8 +179,8 @@ static LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_ra
 	for( note=0; note<NUMNOTES; note++ )
 	{
 		freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
-		//stringcutoff[note] = ( freq * 16.0 ) / (double)samplerate;
-		stringcutoff[note] = 0.9;
+		//so->stringcutoff[note] = ( freq * 16.0 ) / (double)samplerate;
+		so->stringcutoff[note] = 0.9;
 		length = (double)samplerate / freq;
 		stringlength[note] = length;
 		strings[note] = malloc( length * sizeof( double ) );
