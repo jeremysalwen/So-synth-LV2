@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
-#include <signal.h>
 #include "so-666.h"
 int done;
 
@@ -31,14 +30,13 @@ double dist( double in )
 	return out;
 }
 
-int runSO_666( LV2_Handle arg, uint32_t frames )
+int runSO_666( LV2_Handle arg, uint32_t nframes )
 {
 	so_666* so=(so_666*)arg;
-	jack_default_audio_sample_t *outbuffer;
+	float* outbuffer=so->output;
+	
 	int i, note;
 	double  sample, damp;
-
-	outbuffer = (jack_default_audio_sample_t *) jack_port_get_buffer( outport, nframes );
 
 	for( i=0; i<nframes; i++ )
 	{
@@ -92,10 +90,6 @@ int runSO_666( LV2_Handle arg, uint32_t frames )
 
 int main( int argc, char *argv[] )
 {
-	jack_client_t *jackClient;
-
-	snd_seq_t *seqport;
-	struct pollfd *pfd;
 	int npfd;
 	snd_seq_event_t *midievent;
 	int channel, midiport;
@@ -105,14 +99,7 @@ int main( int argc, char *argv[] )
 
 	puts( "SO-666 v.1.0 by 50m30n3 2009" );
 
-	if( argc > 1 )
-		channel = atoi( argv[1] );
-	else
-		channel = 0;
-
-	signal( SIGINT, sig_exit );
-	signal( SIGTERM, sig_exit );
-
+	channel = 0;
 
 	puts( "Connecting to Jack Audio Server" );
 	
@@ -295,7 +282,7 @@ static LV2_Descriptor so_666_Descriptor= {
 LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) {
     switch(index) {
         case 0:
-            return so_666_descriptor;
+            return so_666_Descriptor;
         default:
             return NULL;
     }
