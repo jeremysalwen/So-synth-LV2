@@ -1,7 +1,7 @@
 OBJECTS = main.o
 BINARY = so-666
 CC = gcc
-CFLAGS = -Wall -O3 -lm `pkg-config --cflags --libs jack` `pkg-config --cflags --libs alsa`
+CFLAGS = -Wall -O3 -lm `pkg-config --cflags --libs lv2core`
 
 $(BINARY) : $(OBJECTS)
 	$(CC) $(CFLAGS) -lm $^ -o $@

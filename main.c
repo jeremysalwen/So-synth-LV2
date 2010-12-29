@@ -3,11 +3,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <signal.h>
-
-#include <jack/jack.h>
-
-#include <alsa/asoundlib.h>
-
+#include <so-666.h>
 int done;
 
 #define NUMNOTES 80
@@ -25,19 +21,6 @@ double hpval, hplast;
 double fcutoff, freso, ffeedback;
 unsigned int feedback, cutoff, resonance, volume;
 
-jack_port_t *outport;
-
-void sig_exit( int sig )
-{
-	puts( "Got SINGINT or SIGTERM, shutting down" );
-	done = 1;
-}
-
-void jack_shutdown( void *arg )
-{
-	puts( "Jack kicked us, were boned" );
-	exit( 1 );
-}
 
 double dist( double in )
 {
@@ -291,5 +274,25 @@ int main( int argc, char *argv[] )
 	jack_client_close( jackClient );
 
 	return 0;
+}
+
+static LV2_Descriptor so-666-Descriptor= {
+	.URI="urn::plugins:so-666",
+	.instantiate=NULL,
+	.connect_port=NULL,
+	.activate=NULL,
+	.run=NULL,
+	.deactivate=NULL,
+	.cleanup=NULL,
+	.extension_data=NULL
+};
+
+LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) {
+    switch(index) {
+        case 0:
+            return so-666-descriptor;
+        default:
+            return NULL;
+    }
 }
 
