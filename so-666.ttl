@@ -9,12 +9,13 @@
     lv2:port [
     a lv2:AudioPort ;
     a lv2:OutputPort ;
-    lv2:index 1 ;
+    lv2:index 0 ;
     lv2:symbol "output" ;
     lv2:name "Output" ;
     ] , [
     a lv2:InputPort;
     a lv2:EventPort;
+    lv2:index 1 ;
     ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent>;
     lv2:symbol "midi";
     lv2:name "MIDI Input";

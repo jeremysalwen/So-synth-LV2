@@ -30,6 +30,9 @@
 #define MIDI_NOTEOFF 0x8
 #define MIDI_CONTROL 0xB
 
+#define PORT_OUTPUT 0
+#define PORT_MIDI 1
+
 LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index);
 
 typedef struct midi_event_t {
