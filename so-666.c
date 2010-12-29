@@ -31,7 +31,7 @@ double dist( double in )
 	return out;
 }
 
-int process( jack_nframes_t nframes, void *arg )
+int runSO-666( LV2_Handle *arg, uint32_t frames )
 {
 	jack_default_audio_sample_t *outbuffer;
 	int i, note;
@@ -277,11 +277,11 @@ int main( int argc, char *argv[] )
 }
 
 static LV2_Descriptor so-666-Descriptor= {
-	.URI="urn::plugins:so-666",
+	.URI="urn:50m30n3:plugins:so-666",
 	.instantiate=NULL,
 	.connect_port=NULL,
 	.activate=NULL,
-	.run=NULL,
+	.run=runSO-666,
 	.deactivate=NULL,
 	.cleanup=NULL,
 	.extension_data=NULL
