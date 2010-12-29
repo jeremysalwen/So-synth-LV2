@@ -15,11 +15,18 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lv2.h>
-
+#include <string.h>
+#include "event-helpers.h"
+#include "uri-map.h"
 LV2_SYMBOL_EXPORT
 const LV2_Descriptor *lv2_descriptor(uint32_t index);
 
 
 typedef struct so_666_t {
 	float* output;
+	LV2_Event_Buffer *MidiIn;
+	LV2_Event_Iterator in_iterator;
+	
+	LV2_Event_Feature* event_ref;
+	int midi_event_id;
 } so_666;

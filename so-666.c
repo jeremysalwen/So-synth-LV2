@@ -24,17 +24,17 @@ unsigned int feedback, cutoff, resonance, volume;
 double dist( double in )
 {
 	double out;
-	
+
 	out = tanh( in );
-	
+
 	return out;
 }
 
-int runSO_666( LV2_Handle arg, uint32_t nframes )
+static void runSO_666( LV2_Handle arg, uint32_t nframes )
 {
 	so_666* so=(so_666*)arg;
 	float* outbuffer=so->output;
-	
+
 	int i, note;
 	double  sample, damp;
 
@@ -48,10 +48,10 @@ int runSO_666( LV2_Handle arg, uint32_t nframes )
 
 			if( stringpos[note] > 0 )
 				strings[note][stringpos[note]] = strings[note][stringpos[note]]*damp +
-								 strings[note][stringpos[note]-1]*(1.0-damp);
+				strings[note][stringpos[note]-1]*(1.0-damp);
 			else
 				strings[note][stringpos[note]] = strings[note][stringpos[note]]*damp +
-								 strings[note][stringlength[note]-1]*(1.0-damp);
+				strings[note][stringlength[note]-1]*(1.0-damp);
 
 			strings[note][stringpos[note]] = dist( strings[note][stringpos[note]] ) * 0.99;
 
@@ -67,7 +67,7 @@ int runSO_666( LV2_Handle arg, uint32_t nframes )
 		lplast += lpval;
 		lpval *= freso;
 		sample = lplast;
-		
+
 		for( note=0; note<NUMNOTES; note++ )
 		{
 			if( status[note] > 0 )
@@ -84,103 +84,12 @@ int runSO_666( LV2_Handle arg, uint32_t nframes )
 
 		outbuffer[i] = dist( sample ) * (volume/127.0);
 	}
-	
-	return 0;
+
 }
 
 int main( int argc, char *argv[] )
 {
-	int npfd;
-	snd_seq_event_t *midievent;
-	int channel, midiport;
-	
-	int note, length, i;
-	double freq;
 
-	puts( "SO-666 v.1.0 by 50m30n3 2009" );
-
-	channel = 0;
-
-	puts( "Connecting to Jack Audio Server" );
-	
-	jackClient = jack_client_open( "SO-666", JackNoStartServer, NULL );
-	if( jackClient == NULL )
-	{
-		fputs( "Cannot connect to Jack Server\n", stderr );
-		return 1;
-	}
-
-	jack_on_shutdown( jackClient, jack_shutdown, 0 );
-
-	outport = jack_port_register( jackClient, "output", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0 );
-
-	jack_set_process_callback( jackClient, process, 0 );
-
-	samplerate = jack_get_sample_rate( jackClient );
-
-
-	puts( "Initializing synth parameters" );
-
-	feedback = 32;
-	cutoff = 64;
-	resonance = 64;
-	volume = 100;
-
-	fcutoff = pow( (cutoff+50.0)/200.0, 5.0 );
-	freso = resonance/127.0;
-	ffeedback = 0.01+pow( feedback/127.0, 4.0)*0.9;
-
-	for( note=0; note<NUMNOTES; note++ )
-	{
-		freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
-		//stringcutoff[note] = ( freq * 16.0 ) / (double)samplerate;
-		stringcutoff[note] = 0.9;
-		length = (double)samplerate / freq;
-		stringlength[note] = length;
-		strings[note] = malloc( length * sizeof( double ) );
-		if( strings[note] == NULL )
-		{
-			fputs( "Error allocating memory\n", stderr );
-			return 1;
-		}
-		
-		for( i=0; i<length; i++ )
-		{
-			strings[note][i] = 0.0;
-		}
-		stringpos[note] = 0;
-		status[note] = 0;
-	}
-
-	jack_activate( jackClient );
-
-
-	printf( "Listening on MIDI channel %i\n", channel );
-
-	if( snd_seq_open( &seqport, "default", SND_SEQ_OPEN_INPUT, 0 ) < 0 )
-	{
-		fputs( "Cannot connect to ALSA sequencer\n", stderr );
-		return 1;
-	}
-
-	snd_seq_set_client_name( seqport, "SO-666" );
-
-	midiport = snd_seq_create_simple_port( seqport, "input",
-		SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
-		SND_SEQ_PORT_TYPE_APPLICATION );
-
-	if( midiport < 0 )
-	{
-		fputs( "Cannot create ALSA sequencer port\n", stderr );
-		return 1;
-	}
-
-	npfd = snd_seq_poll_descriptors_count( seqport, POLLIN );
-	pfd = (struct pollfd *)malloc( npfd * sizeof( struct pollfd ) );
-	snd_seq_poll_descriptors( seqport, pfd, npfd, POLLIN );
-
-
-	done = 0;
 
 	while( ! done )
 	{
@@ -189,7 +98,7 @@ int main( int argc, char *argv[] )
 			do
 			{
 				snd_seq_event_input( seqport, &midievent );
-				
+
 				if( ( midievent->type == SND_SEQ_EVENT_NOTEON ) && ( midievent->data.note.channel == channel ) )
 				{
 					note = midievent->data.note.note;
@@ -239,7 +148,7 @@ int main( int argc, char *argv[] )
 						fflush( stdout );
 					}
 				}
-				
+
 				snd_seq_free_event( midievent );
 			}
 			while( snd_seq_event_input_pending( seqport, 0 ) > 0 );
@@ -248,23 +157,124 @@ int main( int argc, char *argv[] )
 
 	return 0;
 }
+static LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features) {
+	so_666* so=malloc(sizeof(so_666));
+	LV2_URI_Map_Feature *map_feature;
+	const LV2_Feature * const *  i;
+	for (i = features; *i; i++) {
+		if (!strcmp((*i)->URI, "http://lv2plug.in/ns/ext/uri-map")) {
+		            map_feature = (*i)->data;
+		            so->midi_event_id = map_feature->uri_to_id(map_feature->callback_data,"http://lv2plug.in/ns/ext/event","http://lv2plug.in/ns/ext/midi#MidiEvent");
+		} else if (!strcmp((*i)->URI, "http://lv2plug.in/ns/ext/event")) {
+		so->event_ref = (*i)->data;
+	}
+			int npfd;
+	int channel, midiport;
 
-void cleanupSO_666(LV2_Handle instance) {
-	
+	int note, length, i;
+	double freq;
+
+	puts( "SO-666 v.1.0 by 50m30n3 2009" );
+
+	channel = 0;
+
+	puts( "Connecting to Jack Audio Server" );
+
+	jackClient = jack_client_open( "SO-666", JackNoStartServer, NULL );
+	if( jackClient == NULL )
+	{
+		fputs( "Cannot connect to Jack Server\n", stderr );
+		return 1;
+	}
+
+	jack_on_shutdown( jackClient, jack_shutdown, 0 );
+
+	outport = jack_port_register( jackClient, "output", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0 );
+
+	jack_set_process_callback( jackClient, process, 0 );
+
+	samplerate = jack_get_sample_rate( jackClient );
+
+
+	puts( "Initializing synth parameters" );
+
+	feedback = 32;
+	cutoff = 64;
+	resonance = 64;
+	volume = 100;
+
+	fcutoff = pow( (cutoff+50.0)/200.0, 5.0 );
+	freso = resonance/127.0;
+	ffeedback = 0.01+pow( feedback/127.0, 4.0)*0.9;
+
+	for( note=0; note<NUMNOTES; note++ )
+	{
+		freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
+		//stringcutoff[note] = ( freq * 16.0 ) / (double)samplerate;
+		stringcutoff[note] = 0.9;
+		length = (double)samplerate / freq;
+		stringlength[note] = length;
+		strings[note] = malloc( length * sizeof( double ) );
+		if( strings[note] == NULL )
+		{
+			fputs( "Error allocating memory\n", stderr );
+			return 1;
+		}
+
+		for( i=0; i<length; i++ )
+		{
+			strings[note][i] = 0.0;
+		}
+		stringpos[note] = 0;
+		status[note] = 0;
+	}
+
+	jack_activate( jackClient );
+
+
+	printf( "Listening on MIDI channel %i\n", channel );
+
+	if( snd_seq_open( &seqport, "default", SND_SEQ_OPEN_INPUT, 0 ) < 0 )
+	{
+		fputs( "Cannot connect to ALSA sequencer\n", stderr );
+		return 1;
+	}
+
+	snd_seq_set_client_name( seqport, "SO-666" );
+
+	midiport = snd_seq_create_simple_port( seqport, "input",
+	                                      SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
+	                                      SND_SEQ_PORT_TYPE_APPLICATION );
+
+	if( midiport < 0 )
+	{
+		fputs( "Cannot create ALSA sequencer port\n", stderr );
+		return 1;
+	}
+
+	npfd = snd_seq_poll_descriptors_count( seqport, POLLIN );
+	pfd = (struct pollfd *)malloc( npfd * sizeof( struct pollfd ) );
+	snd_seq_poll_descriptors( seqport, pfd, npfd, POLLIN );
+
+
+	done = 0;
+	return so;
+}
+			
+static void cleanupSO_666(LV2_Handle instance) {
+
 	free( pfd );
 	snd_seq_delete_port( seqport, midiport );
 	snd_seq_close( seqport );
-	
+
 	jack_deactivate( jackClient );
 
 	puts( "Freeing data" );
-	for( note=0; note<NUMNOTES; note++ )
+	int note;
+	for(note=0; note<NUMNOTES; note++ )
 	{
 		free( strings[note] );
 	}
-
-	jack_port_unregister( jackClient, outport );
-	jack_client_close( jackClient );
 
 }
 
@@ -280,11 +290,11 @@ static LV2_Descriptor so_666_Descriptor= {
 };
 
 LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) {
-    switch(index) {
-        case 0:
-            return so_666_Descriptor;
-        default:
-            return NULL;
-    }
+	switch(index) {
+		case 0:
+			return &so_666_Descriptor;
+		default:
+			return NULL;
+	}
 }
 
