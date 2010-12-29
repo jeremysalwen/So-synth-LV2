@@ -5,7 +5,7 @@ CFLAGS = -Wall -O3 -lm `pkg-config --cflags --libs lv2core`
 INSTALLDIR = $(DESTDIR)/usr/lib/lv2/
 INSTALLNAME = so-666.lv2/
 $(LIBRARY) : $(OBJECTS)
-	$(CC) $(CFLAGS) -shared -o $@
+	$(CC) $(CFLAGS) $(OBJECTS) -shared -o $@
 
 .SUFFIXES : .c .o
 
