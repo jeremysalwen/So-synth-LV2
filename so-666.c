@@ -23,49 +23,52 @@ static void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 		while(lv2_event_is_valid(&so->in_iterator)) {
 			uint8_t* data;
 			LV2_Event* event= lv2_event_get(&so->in_iterator,&data);
-			if(event->frames>nframes) {
-				break;
-			}
-			if(event->type==so->midi_event_id) {
-				const midi_event* evt=(midi_event*)data;
-				if(evt->channel==so->channel) {
-					if( evt->command==MIDI_NOTEON) 	{
-						note = evt->info1;
-						if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) ) {
-							note -= BASENOTE;
-							status[note] = 1;
+			if (event->type == 0) {
+				so->event_ref->lv2_event_unref(so->event_ref->callback_data, event);
+			} else if(event->type==so->midi_event_id) {
+				if(event->frames > i) {
+					break;
+				} else{
+					const midi_event* evt=(midi_event*)data;
+					if(evt->channel==so->channel) {
+						if( evt->command==MIDI_NOTEON) 	{
+							note = evt->info1;
+							if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) ) {
+								note -= BASENOTE;
+								status[note] = 1;
+							}
 						}
-					}
-					else if(  evt->command==MIDI_NOTEOFF )	{
-						note = evt->info1;
-						if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) ) {
-							note -= BASENOTE;
-							status[note] = 0;
+						else if(  evt->command==MIDI_NOTEOFF )	{
+							note = evt->info1;
+							if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) ) {
+								note -= BASENOTE;
+								status[note] = 0;
+							}
 						}
-					}
-					else if( evt->command==MIDI_CONTROL )	{
-						if( evt->info1 == 74 )	{
-							unsigned int cutoff =evt->info2;
-							so->fcutoff = pow( (cutoff+50.0)/200.0, 5.0 );
-							printf( "Cutoff: %i     \r", cutoff );
-							fflush( stdout );
-						}
-						else if( evt->info1 == 71 )	{
-							unsigned int resonance = evt->info2;
-							so->freso = resonance/127.0;
-							printf( "Resonance: %i     \r", resonance );
-							fflush( stdout );
-						}
-						else if( evt->info1 == 7 )	{
-							so->volume = evt->info2;
-							printf( "Volume: %i     \r", so->volume );
-							fflush( stdout );
-						}
-						else if( evt->info1== 1 ) {
-							unsigned int feedback =evt->info2;
-							so->ffeedback = 0.01+pow( feedback/127.0, 4.0)*0.9;
-							printf( "Feedback: %i    \r", feedback );
-							fflush( stdout );
+						else if( evt->command==MIDI_CONTROL )	{
+							if( evt->info1 == 74 )	{
+								unsigned int cutoff =evt->info2;
+								so->fcutoff = pow( (cutoff+50.0)/200.0, 5.0 );
+								printf( "Cutoff: %i     \r", cutoff );
+								fflush( stdout );
+							}
+							else if( evt->info1 == 71 )	{
+								unsigned int resonance = evt->info2;
+								so->freso = resonance/127.0;
+								printf( "Resonance: %i     \r", resonance );
+								fflush( stdout );
+							}
+							else if( evt->info1 == 7 )	{
+								so->volume = evt->info2;
+								printf( "Volume: %i     \r", so->volume );
+								fflush( stdout );
+							}
+							else if( evt->info1== 1 ) {
+								unsigned int feedback =evt->info2;
+								so->ffeedback = 0.01+pow( feedback/127.0, 4.0)*0.9;
+								printf( "Feedback: %i    \r", feedback );
+								fflush( stdout );
+							}
 						}
 					}
 				}
