@@ -181,10 +181,24 @@ void cleanupSO_666(LV2_Handle instance) {
 	free(so);
 }
 
+void connectPortSO_666(LV2_Handle instance, uint32_t port, void *data_location) {
+	so_666* so=(so_666*) instance;
+	switch(port) {
+		case PORT_OUTPUT:
+			so->output=data_location;
+			break;
+		case PORT_MIDI:
+			so->MidiIn=data_location;
+			break;
+		default:
+			fputs("Warning, unconnected port!",stderr);
+	}
+}
+
 static LV2_Descriptor so_666_Descriptor= {
 	.URI="urn:50m30n3:plugins:SO-666",
 	.instantiate=instantiateSO_666,
-	.connect_port=NULL,
+	.connect_port=connectPortSO_666,
 	.activate=NULL,
 	.run=runSO_666,
 	.deactivate=NULL,
