@@ -12,7 +12,7 @@ double dist( double in )
 static void runSO_666( LV2_Handle arg, uint32_t nframes )
 {
 	so_666* so=(so_666*)arg;
-	
+	lv2_event_begin(&so->in_iterator,so->MidiIn);
 	double **strings=so->strings;
 	unsigned int* stringpos=so->stringpos;
 	unsigned int* stringlength=so->stringlength;
@@ -22,12 +22,15 @@ static void runSO_666( LV2_Handle arg, uint32_t nframes )
 	int i, note;
 	double  sample, damp;
 
-	for( i=0; i<nframes; i++ )
-	{
-	do
-			{
-				snd_seq_event_input( seqport, &midievent );
-
+for( i=0; i<nframes; i++ )
+{
+	while(lv2_event_is_valid(&so->in_iterator)) {
+		LV2_Event* event=lv2_event_get(&so->in_iterator);
+		if(event->frames>iframes) {
+			break;
+		}
+		if(event->type==so->midi_event_id) {
+			const uint8_t* mididata=((unit8_t*)event)+sizeof(LV2_Event);
 				if( ( midievent->type == SND_SEQ_EVENT_NOTEON ) && ( midievent->data.note.channel == channel ) )
 				{
 					note = midievent->data.note.note;
@@ -77,11 +80,8 @@ static void runSO_666( LV2_Handle arg, uint32_t nframes )
 						fflush( stdout );
 					}
 				}
-
-				snd_seq_free_event( midievent );
+			lv2_event_increment(&so->in_iterator);
 			}
-			while( snd_seq_event_input_pending( seqport, 0 ) > 0 );
-			
 		sample = (((double)rand()/(double)RAND_MAX)*2.0-1.0)*0.001;
 
 		for( note=0; note<NUMNOTES; note++ )
@@ -129,20 +129,6 @@ static void runSO_666( LV2_Handle arg, uint32_t nframes )
 
 }
 
-int main( int argc, char *argv[] )
-{
-
-
-	while( ! done )
-	{
-		if( poll( pfd, npfd, 100000 ) > 0 )
-		{
-			
-		}
-	}
-
-	return 0;
-}
 static LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features) {
 	so_666* so=malloc(sizeof(so_666));
 	LV2_URI_Map_Feature *map_feature;
@@ -214,7 +200,7 @@ static void cleanupSO_666(LV2_Handle instance) {
 
 static LV2_Descriptor so_666_Descriptor= {
 	.URI="urn:50m30n3:plugins:so-666",
-	.instantiate=NULL,
+	.instantiate=InstantiateSO_666,
 	.connect_port=NULL,
 	.activate=NULL,
 	.run=runSO_666,
