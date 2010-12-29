@@ -182,7 +182,7 @@ void cleanupSO_666(LV2_Handle instance) {
 }
 
 static LV2_Descriptor so_666_Descriptor= {
-	.URI="urn:50m30n3:plugins:so-666",
+	.URI="urn:50m30n3:plugins:SO-666",
 	.instantiate=instantiateSO_666,
 	.connect_port=NULL,
 	.activate=NULL,
