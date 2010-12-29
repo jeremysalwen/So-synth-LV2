@@ -1,10 +1,10 @@
 OBJECTS = so-666.o
-BINARY = so-666
+LIBRARY = libso-666.so
 CC = gcc
 CFLAGS = -Wall -O3 -lm `pkg-config --cflags --libs lv2core`
 
-$(BINARY) : $(OBJECTS)
-	$(CC) $(CFLAGS) -lm $^ -o $@
+$(LIBRARY) : $(OBJECTS)
+	$(CC) $(CFLAGS) -shared -o $@
 
 .SUFFIXES : .c .o
 
@@ -16,5 +16,5 @@ so-666.o : so-666.c
 .PHONY : clean
 
 clean :
-	rm -f $(BINARY) $(OBJECTS)
+	rm -f $(LIBRARY) $(OBJECTS)
 
