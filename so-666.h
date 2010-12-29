@@ -26,10 +26,17 @@
 #define NUMNOTES 80
 #define BASENOTE 21
 
-
+#define MIDI_NOTEON 0x9
+#define MIDI_NOTEOFF 0x8
+#define MIDI_CONTROL 0xB
 LV2_SYMBOL_EXPORT
 const LV2_Descriptor *lv2_descriptor(uint32_t index);
-
+typedef struct midi_event_t {
+	unsigned int command:4;
+	unsigned int channel:4;
+	unsigned char info1;
+	unsigned char info2;
+} midi_event;
 
 typedef struct so_666_t {
 	float* output;
@@ -45,10 +52,17 @@ typedef struct so_666_t {
 	double stringcutoff[NUMNOTES];
 	int status[NUMNOTES];
 
-	unsigned int samplerate;
+	unsigned int volume;
+	double samplerate;
+	
 	double lpval, lplast;
 	double hpval, hplast;
 	double fcutoff, freso, ffeedback;
-	unsigned int feedback, cutoff, resonance, volume;
 
+	
+	int npfd;
+	int channel, midiport;
+
+	int note, length, i;
+	double freq;
 } so_666;
