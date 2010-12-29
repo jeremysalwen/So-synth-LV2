@@ -1,24 +1,7 @@
-#include <stdio.h>	
-#include <stdlib.h>
-#include <unistd.h>
-#include <math.h>
+
 #include "so-666.h"
 int done;
 
-#define NUMNOTES 80
-#define BASENOTE 21
-
-double *strings[NUMNOTES];
-unsigned int stringpos[NUMNOTES];
-unsigned int stringlength[NUMNOTES];
-double stringcutoff[NUMNOTES];
-int status[NUMNOTES];
-
-unsigned int samplerate;
-double lpval, lplast;
-double hpval, hplast;
-double fcutoff, freso, ffeedback;
-unsigned int feedback, cutoff, resonance, volume;
 
 
 double dist( double in )
@@ -168,7 +151,8 @@ static LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_ra
 		} else if (!strcmp((*i)->URI, "http://lv2plug.in/ns/ext/event")) {
 		so->event_ref = (*i)->data;
 	}
-			int npfd;
+	
+	int npfd;
 	int channel, midiport;
 
 	int note, length, i;
@@ -177,24 +161,6 @@ static LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_ra
 	puts( "SO-666 v.1.0 by 50m30n3 2009" );
 
 	channel = 0;
-
-	puts( "Connecting to Jack Audio Server" );
-
-	jackClient = jack_client_open( "SO-666", JackNoStartServer, NULL );
-	if( jackClient == NULL )
-	{
-		fputs( "Cannot connect to Jack Server\n", stderr );
-		return 1;
-	}
-
-	jack_on_shutdown( jackClient, jack_shutdown, 0 );
-
-	outport = jack_port_register( jackClient, "output", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0 );
-
-	jack_set_process_callback( jackClient, process, 0 );
-
-	samplerate = jack_get_sample_rate( jackClient );
-
 
 	puts( "Initializing synth parameters" );
 
@@ -229,45 +195,10 @@ static LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_ra
 		status[note] = 0;
 	}
 
-	jack_activate( jackClient );
-
-
-	printf( "Listening on MIDI channel %i\n", channel );
-
-	if( snd_seq_open( &seqport, "default", SND_SEQ_OPEN_INPUT, 0 ) < 0 )
-	{
-		fputs( "Cannot connect to ALSA sequencer\n", stderr );
-		return 1;
-	}
-
-	snd_seq_set_client_name( seqport, "SO-666" );
-
-	midiport = snd_seq_create_simple_port( seqport, "input",
-	                                      SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
-	                                      SND_SEQ_PORT_TYPE_APPLICATION );
-
-	if( midiport < 0 )
-	{
-		fputs( "Cannot create ALSA sequencer port\n", stderr );
-		return 1;
-	}
-
-	npfd = snd_seq_poll_descriptors_count( seqport, POLLIN );
-	pfd = (struct pollfd *)malloc( npfd * sizeof( struct pollfd ) );
-	snd_seq_poll_descriptors( seqport, pfd, npfd, POLLIN );
-
-
-	done = 0;
 	return so;
 }
 			
 static void cleanupSO_666(LV2_Handle instance) {
-
-	free( pfd );
-	snd_seq_delete_port( seqport, midiport );
-	snd_seq_close( seqport );
-
-	jack_deactivate( jackClient );
 
 	puts( "Freeing data" );
 	int note;

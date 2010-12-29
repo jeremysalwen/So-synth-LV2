@@ -18,6 +18,15 @@
 #include <string.h>
 #include "event-helpers.h"
 #include "uri-map.h"
+#include <stdio.h>	
+#include <stdlib.h>
+#include <unistd.h>
+#include <math.h>
+
+#define NUMNOTES 80
+#define BASENOTE 21
+
+
 LV2_SYMBOL_EXPORT
 const LV2_Descriptor *lv2_descriptor(uint32_t index);
 
@@ -26,7 +35,20 @@ typedef struct so_666_t {
 	float* output;
 	LV2_Event_Buffer *MidiIn;
 	LV2_Event_Iterator in_iterator;
-	
+
 	LV2_Event_Feature* event_ref;
 	int midi_event_id;
+
+	double *strings[NUMNOTES];
+	unsigned int stringpos[NUMNOTES];
+	unsigned int stringlength[NUMNOTES];
+	double stringcutoff[NUMNOTES];
+	int status[NUMNOTES];
+
+	unsigned int samplerate;
+	double lpval, lplast;
+	double hpval, hplast;
+	double fcutoff, freso, ffeedback;
+	unsigned int feedback, cutoff, resonance, volume;
+
 } so_666;
