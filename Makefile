@@ -20,7 +20,7 @@ clean :
 	rm -f $(LIBRARY) $(OBJECTS)
 
 install :
-	mkdir -p $(INSTALLDIR)
+	mkdir -p $(INSTALLDIR)$(INSTALLNAME)
 	install $(LIBRARY) $(INSTALLDIR)$(INSTALLNAME)
 	install manifest.ttl $(INSTALLDIR)$(INSTALLNAME)
 	install so-666.ttl $(INSTALLDIR)$(INSTALLNAME)
