@@ -31,8 +31,9 @@ double dist( double in )
 	return out;
 }
 
-int runSO_666( LV2_Handle *arg, uint32_t frames )
+int runSO_666( LV2_Handle arg, uint32_t frames )
 {
+	so_666* so=(so_666*)arg;
 	jack_default_audio_sample_t *outbuffer;
 	int i, note;
 	double  sample, damp;
@@ -280,7 +281,7 @@ void cleanupSO_666(LV2_Handle instance) {
 
 }
 
-static LV2_Descriptor so-666-Descriptor= {
+static LV2_Descriptor so_666_Descriptor= {
 	.URI="urn:50m30n3:plugins:so-666",
 	.instantiate=NULL,
 	.connect_port=NULL,
@@ -294,7 +295,7 @@ static LV2_Descriptor so-666-Descriptor= {
 LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) {
     switch(index) {
         case 0:
-            return so-666-descriptor;
+            return so_666_descriptor;
         default:
             return NULL;
     }
