@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <signal.h>
-#include <so-666.h>
+#include "so-666.h"
 int done;
 
 #define NUMNOTES 80
@@ -31,7 +31,7 @@ double dist( double in )
 	return out;
 }
 
-int runSO-666( LV2_Handle *arg, uint32_t frames )
+int runSO_666( LV2_Handle *arg, uint32_t frames )
 {
 	jack_default_audio_sample_t *outbuffer;
 	int i, note;
@@ -258,6 +258,11 @@ int main( int argc, char *argv[] )
 		}
 	}
 
+	return 0;
+}
+
+void cleanupSO_666(LV2_Handle instance) {
+	
 	free( pfd );
 	snd_seq_delete_port( seqport, midiport );
 	snd_seq_close( seqport );
@@ -273,7 +278,6 @@ int main( int argc, char *argv[] )
 	jack_port_unregister( jackClient, outport );
 	jack_client_close( jackClient );
 
-	return 0;
 }
 
 static LV2_Descriptor so-666-Descriptor= {
@@ -281,9 +285,9 @@ static LV2_Descriptor so-666-Descriptor= {
 	.instantiate=NULL,
 	.connect_port=NULL,
 	.activate=NULL,
-	.run=runSO-666,
+	.run=runSO_666,
 	.deactivate=NULL,
-	.cleanup=NULL,
+	.cleanup=cleanupSO_666,
 	.extension_data=NULL
 };
 
