@@ -13,8 +13,13 @@ $(LIBRARY) : $(OBJECTS)
 
 so-666.o : so-666.c
 
-.PHONY : clean
+.PHONY : clean install uninstall
 
 clean :
 	rm -f $(LIBRARY) $(OBJECTS)
 
+install :
+	mkdir -p /usr/lib/lv2/so-666.lv2/
+	install $(LIBRARY) /usr/lib/lv2/so-666.lv2/
+	install manifest.ttl /usr/lib/lv2/so-666.lv2/
+	install so-666.ttl /usr/lib/lv2/so-666.lv2/
