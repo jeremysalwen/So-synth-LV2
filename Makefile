@@ -2,7 +2,8 @@ OBJECTS = so-666.o
 LIBRARY = libso-666.so
 CC = gcc
 CFLAGS = -Wall -O3 -lm `pkg-config --cflags --libs lv2core`
-
+INSTALLDIR = /usr/lib/lv2/
+INSTALLNAME = so-666.lv2/
 $(LIBRARY) : $(OBJECTS)
 	$(CC) $(CFLAGS) -shared -o $@
 
@@ -19,7 +20,9 @@ clean :
 	rm -f $(LIBRARY) $(OBJECTS)
 
 install :
-	mkdir -p /usr/lib/lv2/so-666.lv2/
-	install $(LIBRARY) /usr/lib/lv2/so-666.lv2/
-	install manifest.ttl /usr/lib/lv2/so-666.lv2/
-	install so-666.ttl /usr/lib/lv2/so-666.lv2/
+	mkdir -p $(INSTALLDIR)
+	install $(LIBRARY) $(INSTALLDIR)$(INSTALLNAME)
+	install manifest.ttl $(INSTALLDIR)$(INSTALLNAME)
+	install so-666.ttl $(INSTALLDIR)$(INSTALLNAME)
+uninstall :
+	rm -rf $(INSTALLDIR)$(INSTALLNAME)
