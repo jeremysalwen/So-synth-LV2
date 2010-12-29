@@ -1,9 +1,24 @@
-so-666 for Debian
------------------
+SO-666 v.1.0 by 50m30n3 2009
 
-<this file describes information about the source package, see Debian policy
-manual section 4.14. You WILL either need to modify or delete this file>
+SO-666 is a feedback based drone synthesizer building upon the SO-KL5 synth.
+It creates haunting cacophonic howls and drones.
+It's a bit hard to play but making good use of the modwheel will help keep the
+sound in control.
 
+To run the synth you need Jack and ALSA. You can set a different midi channel
+by starting the program using the channel number as argument. The default
+channel is zero.
 
+All synthesis parameters can be edited using MIDI CC messages.
 
+Parameter list:
+CC#1	-	Feedback (mod wheel)
+CC#7	-	Volume
+CC#71	-	Filter Resonance
+CC#74	-	Filter Cutoff
+
+To compile the code you need the ALSA and Jack developement files.
+
+This software is licensed under the GNU GPL V3 see LICENSE for details.
+Bug reports, questions and death threats to someone@d00m.org.
 

@@ -1,23 +1,18 @@
-Source: so-666
+Source: so-666-lv2
 Priority: extra
-Maintainer: Jeremy <jeremy@susan>
+Maintainer: Jeremy Salwen<jeremybubs@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~)
 Standards-Version: 3.8.4
-Section: libs
-Homepage: <insert the upstream URL, if relevant>
-#Vcs-Git: git://git.debian.org/collab-maint/so-666.git
+Section: sound
+Homepage: http://d00m.org/~someone/so666/
+Vcs-Git: git@github.com:jeremysalwen/SO-666-LV2.git
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/so-666.git;a=summary
 
-Package: so-666-dev
-Section: libdevel
-Architecture: any
-Depends: so-666BROKEN (= ${binary:Version})
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
-
-Package: so-666BROKEN
-Section: libs
+Package: so-666-lv2
+Section: sound
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: A feedback based drone synthesizer for LV2
+ This package is an unofficial port of the SO-666 synthesizer
+ to the LV2 plugin format.  In order to use it, you need a host
+ for LV2 plugins such as Ardour, Qtractor, or Ingen
