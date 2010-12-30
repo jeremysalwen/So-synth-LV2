@@ -146,7 +146,6 @@ LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, con
 	cutoff = 64;
 	resonance = 64;
 	so->volume = 100;
-	so->samplerate=s_rate;
 	so->fcutoff = pow( (cutoff+50.0)/200.0, 5.0 );
 	so->freso = resonance/127.0;
 	so->ffeedback = 0.01+pow( feedback/127.0, 4.0)*0.9;
@@ -159,7 +158,7 @@ LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, con
 	int note;
 	for( note=0; note<NUMNOTES; note++ ) {
 		double freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
-		//so->stringcutoff[note] = ( freq * 16.0 ) / (double)samplerate;
+		//so->stringcutoff[note] = ( freq * 16.0 ) / (double)s_rate;
 		so->stringcutoff[note] = 0.9;
 		int length = (double)s_rate /freq;
 		so->stringlength[note] = length;

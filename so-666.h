@@ -57,7 +57,6 @@ typedef struct so_666_t {
 	int status[NUMNOTES];
 
 	unsigned int volume;
-	double samplerate;
 	
 	double lpval, lplast;
 	double hpval, hplast;
