@@ -30,22 +30,22 @@ static void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 					break;
 				} else{
 					const uint8_t* evt=(uint8_t*)data;
-					if(evt[0]&MIDI_CHANNELMASK==so->channel) {
-						if( evt[0]&MIDI_COMMANDMASK==MIDI_NOTEON) 	{
+					if((evt[0]&MIDI_CHANNELMASK)==so->channel) {
+						if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEON) 	{
 							note = evt[1];
-							if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) ) {
+							if( (note >= BASENOTE) && ( note < BASENOTE+NUMNOTES ) ) {
 								note -= BASENOTE;
 								status[note] = 1;
 							}
 						}
-						else if(evt[0]&MIDI_COMMANDMASK==MIDI_NOTEOFF )	{
+						else if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEOFF )	{
 							note = evt[1];
 							if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) ) {
 								note -= BASENOTE;
 								status[note] = 0;
 							}
 						}
-						else if(evt[0]&MIDI_COMMANDMASK==MIDI_CONTROL )	{
+						else if((evt[0]&MIDI_COMMANDMASK)==MIDI_CONTROL )	{
 							if( evt[1] == 74 )	{
 								unsigned int cutoff =evt[2];
 								so->fcutoff = pow( (cutoff+50.0)/200.0, 5.0 );
