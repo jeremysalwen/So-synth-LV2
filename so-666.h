@@ -63,10 +63,5 @@ typedef struct so_666_t {
 	double hpval, hplast;
 	double fcutoff, freso, ffeedback;
 
-	
-	int npfd;
-	int channel, midiport;
-
-	int note, length, i;
-	double freq;
+	int channel;
 } so_666;
