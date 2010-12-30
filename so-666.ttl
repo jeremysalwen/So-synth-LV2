@@ -4,7 +4,7 @@
 @prefix ev: <http://lv2plug.in/ns/ext/event#>.
 <urn:50m30n3:plugins:SO-666> a lv2:Plugin ;
     doap:name "SO-666 Synthesizer" ;
-    doap:licence <http://usefulinc.com/doap/licenses/gpl> ;
+    doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 
     lv2:port [
     a lv2:AudioPort ;
