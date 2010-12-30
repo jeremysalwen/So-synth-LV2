@@ -26,21 +26,18 @@
 #define NUMNOTES 80
 #define BASENOTE 21
 
-#define MIDI_NOTEON 0x9
-#define MIDI_NOTEOFF 0x8
-#define MIDI_CONTROL 0xB
+#define MIDI_COMMANDMASK 0xF0
+#define MIDI_CHANNELMASK 0x0F
+
+#define MIDI_NOTEON 0x90
+#define MIDI_NOTEOFF 0x80
+#define MIDI_CONTROL 0xB0
 
 #define PORT_OUTPUT 0
 #define PORT_MIDI 1
 
 LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index);
 
-typedef struct midi_event_t {
-	unsigned int command:4;
-	unsigned int channel:4;
-	unsigned char info1;
-	unsigned char info2;
-} midi_event;
 
 typedef struct so_666_t {
 	float* output;
