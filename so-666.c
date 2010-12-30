@@ -152,18 +152,18 @@ LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, con
 	so->ffeedback = 0.01+pow( feedback/127.0, 4.0)*0.9;
 	unsigned int note;
 	for( note=0; note<NUMNOTES; note++ ) {
-		so->freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
+		double freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
 		//so->stringcutoff[note] = ( freq * 16.0 ) / (double)samplerate;
 		so->stringcutoff[note] = 0.9;
-		so->length = (double)s_rate / so->freq;
-		so->stringlength[note] = so->length;
-		so->strings[note] = malloc( so->length * sizeof( double ) );
+		int length = (double)s_rate /freq;
+		so->stringlength[note] = length;
+		so->strings[note] = malloc( length * sizeof( double ) );
 		if( so->strings[note] == NULL )	{
 			fputs( "Error allocating memory\n", stderr );
 			return 0;
 		}
 		unsigned int i;
-		for( i=0; i<(so->length); i++ )
+		for( i=0; i<(length); i++ )
 		{
 			so->strings[note][i] = 0.0;
 		}
