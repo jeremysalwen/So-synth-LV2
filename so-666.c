@@ -29,42 +29,42 @@ static void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 				if(event->frames > i) {
 					break;
 				} else{
-					const midi_event* evt=(midi_event*)data;
-					if(evt->channel==so->channel) {
-						if( evt->command==MIDI_NOTEON) 	{
-							note = evt->info1;
+					const uint8_t* evt=(uint8_t*)data;
+					if(evt[0]&MIDI_CHANNELMASK==so->channel) {
+						if( evt[0]&MIDI_COMMANDMASK==MIDI_NOTEON) 	{
+							note = evt[1];
 							if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) ) {
 								note -= BASENOTE;
 								status[note] = 1;
 							}
 						}
-						else if(  evt->command==MIDI_NOTEOFF )	{
-							note = evt->info1;
+						else if(evt[0]&MIDI_COMMANDMASK==MIDI_NOTEOFF )	{
+							note = evt[1];
 							if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) ) {
 								note -= BASENOTE;
 								status[note] = 0;
 							}
 						}
-						else if( evt->command==MIDI_CONTROL )	{
-							if( evt->info1 == 74 )	{
-								unsigned int cutoff =evt->info2;
+						else if(evt[0]&MIDI_COMMANDMASK==MIDI_CONTROL )	{
+							if( evt[1] == 74 )	{
+								unsigned int cutoff =evt[2];
 								so->fcutoff = pow( (cutoff+50.0)/200.0, 5.0 );
 								printf( "Cutoff: %i     \r", cutoff );
 								fflush( stdout );
 							}
-							else if( evt->info1 == 71 )	{
-								unsigned int resonance = evt->info2;
+							else if( evt[1]== 71 )	{
+								unsigned int resonance = evt[2];
 								so->freso = resonance/127.0;
 								printf( "Resonance: %i     \r", resonance );
 								fflush( stdout );
 							}
-							else if( evt->info1 == 7 )	{
-								so->volume = evt->info2;
+							else if( evt[1] == 7 )	{
+								so->volume = evt[2];
 								printf( "Volume: %i     \r", so->volume );
 								fflush( stdout );
 							}
-							else if( evt->info1== 1 ) {
-								unsigned int feedback =evt->info2;
+							else if( evt[1]== 1 ) {
+								unsigned int feedback =evt[2];
 								so->ffeedback = 0.01+pow( feedback/127.0, 4.0)*0.9;
 								printf( "Feedback: %i    \r", feedback );
 								fflush( stdout );
