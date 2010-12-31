@@ -2,5 +2,8 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 <urn:50m30n3:plugins:SO-666> a lv2:Plugin;
-  lv2:binary   <libso-666.so> ;
+  lv2:binary   <libso-synth.so> ;
   rdfs:seeAlso <so-666.ttl> .
+<urn:urn:50m30n3:plugins:SO-kl5> a lv2:Plugin;
+  lv2:binary   <libso-synth.so>;
+  rdfs:seeAlso <so-kl5.ttl>
