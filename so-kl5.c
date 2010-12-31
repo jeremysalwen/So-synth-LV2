@@ -1,7 +1,7 @@
 #include "so-kl5.h"
 
 
-static void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
+void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 	so_kl5* so=(so_kl5*)arg;
 	lv2_event_begin(&so->in_iterator,so->MidiIn);
 	

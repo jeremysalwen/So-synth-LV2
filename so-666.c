@@ -1,13 +1,13 @@
 #include "so-666.h"
 
-double dist( double in )
+static double dist( double in )
 {
 	double out;
 	out = tanh( in );
 	return out;
 }
 
-static void runSO_666( LV2_Handle arg, uint32_t nframes ) {
+void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 	so_666* so=(so_666*)arg;
 	lv2_event_begin(&so->in_iterator,so->MidiIn);
 	double **strings=so->strings;

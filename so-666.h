@@ -37,8 +37,8 @@
 #define PORT_MIDI 1
 
 
-static void runSO_666( LV2_Handle arg, uint32_t nframes );
-static LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
+void runSO_666( LV2_Handle arg, uint32_t nframes );
+LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
 void cleanupSO_666(LV2_Handle instance);
 void connectPortSO_666(LV2_Handle instance, uint32_t port, void *data_location);
 
