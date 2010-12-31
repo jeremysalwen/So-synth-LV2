@@ -202,24 +202,3 @@ void connectPortSO_666(LV2_Handle instance, uint32_t port, void *data_location) 
 			fputs("Warning, unconnected port!",stderr);
 	}
 }
-
-static LV2_Descriptor so_666_Descriptor= {
-	.URI="urn:50m30n3:plugins:SO-666",
-	.instantiate=instantiateSO_666,
-	.connect_port=connectPortSO_666,
-	.activate=NULL,
-	.run=runSO_666,
-	.deactivate=NULL,
-	.cleanup=cleanupSO_666,
-	.extension_data=NULL,
-};
-
-LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) {
-	switch(index) {
-		case 0:
-			return &so_666_Descriptor;
-		default:
-			return NULL;
-	}
-}
-

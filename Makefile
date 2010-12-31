@@ -1,4 +1,4 @@
-OBJECTS = so-666.o so-kl5.o
+OBJECTS = so-666.o so-kl5.o sosynth.o
 LIBRARY = libsosynth.so
 CC = gcc
 CFLAGS += -Wall -O3 -lm `pkg-config --cflags --libs lv2core` -fPIC

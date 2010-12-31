@@ -37,23 +37,23 @@
 #define PORT_MIDI 1
 
 
-static void runSO_666( LV2_Handle arg, uint32_t nframes );
-static LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
-void cleanupSO_666(LV2_Handle instance);
-void connectPortSO_666(LV2_Handle instance, uint32_t port, void *data_location);
+static void runSO_kl5( LV2_Handle arg, uint32_t nframes );
+static LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
+void cleanupSO_kl5(LV2_Handle instance);
+void connectPortSO_kl5(LV2_Handle instance, uint32_t port, void *data_location);
 
-static LV2_Descriptor so_666_Descriptor= {
-	.URI="urn:50m30n3:plugins:SO-666",
-	.instantiate=instantiateSO_666,
-	.connect_port=connectPortSO_666,
+static LV2_Descriptor so_kl5_Descriptor= {
+	.URI="urn:50m30n3:plugins:SO-kl5",
+	.instantiate=instantiateSO_kl5,
+	.connect_port=connectPortSO_kl5,
 	.activate=NULL,
-	.run=runSO_666,
+	.run=runSO_kl5,
 	.deactivate=NULL,
-	.cleanup=cleanupSO_666,
+	.cleanup=cleanupSO_kl5,
 	.extension_data=NULL,
 };
 
-typedef struct so_666_t {
+typedef struct so_kl5_t {
 	float* output;
 	LV2_Event_Buffer *MidiIn;
 	LV2_Event_Iterator in_iterator;
@@ -71,7 +71,9 @@ typedef struct so_666_t {
 	
 	double lpval, lplast;
 	double hpval, hplast;
-	double fcutoff, freso, ffeedback;
+	double fcutoff, freso, ssustain,sattack;
 
 	int channel;
-} so_666;
+
+	double* tempstring;
+} so_kl5;
