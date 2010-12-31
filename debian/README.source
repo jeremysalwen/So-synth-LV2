@@ -27,3 +27,13 @@ SO-KL5 v.1.1 by 50m30n3 2010
 
 SO-KL5 is a string based "piano" synthezizer. The strings are
 modeled using the Karplus-Strong String simulation method.
+
+Parameter list:
+CC#1	-	Sustain
+CC#7	-	Volume
+CC#64	-	Sustain
+CC#71	-	Filter Resonance
+CC#74	-	Filter Cutoff
+
+Sustain can be controlled by CC#1 (Mod Wheel) and CC#64 (Sustain) to make
+control easier for people without a sustain pedal.
