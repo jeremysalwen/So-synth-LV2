@@ -49,7 +49,7 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 									tempstring[0] = tempstring[0]*freq + tempstring[stringlength[note]-1]*(1.0-freq);
 									for( i=1; i<stringlength[note]; i++ )
 									{
-										tempstring[i] = tempstring[i]*freq + tempstring[(i-1)%stringlength[note]]*(1.0-freq);
+										tempstring[j] = tempstring[j]*freq + tempstring[(j-1)%stringlength[note]]*(1.0-freq);
 									}
 								}
 
