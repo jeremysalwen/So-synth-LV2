@@ -4,10 +4,10 @@ This work was packaged for Debian by:
 
 It was downloaded from:
 
-    http://d00m.org/~someone/so666/
+    http://d00m.org/~someone/
     
 The LV2 repackaging comes from:
-    https://github.com/jeremysalwen/SO-666-LV2
+    https://github.com/jeremysalwen/SO-synth-LV2
 
 Upstream Author(s):
 
@@ -16,7 +16,7 @@ Upstream Author(s):
 
 Copyright:
 
-    <Copyright (C) 2009 50m30n3>
+    <Copyright (C) 2010 50m30n3>
     <Copyright (C) 2010 Jeremy Salwen>
 
 License:

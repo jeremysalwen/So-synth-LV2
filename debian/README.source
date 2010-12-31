@@ -22,3 +22,8 @@ To compile the code you need the ALSA and Jack developement files.
 This software is licensed under the GNU GPL V3 see LICENSE for details.
 Bug reports, questions and death threats to someone@d00m.org.
 
+
+SO-KL5 v.1.1 by 50m30n3 2010
+
+SO-KL5 is a string based "piano" synthezizer. The strings are
+modeled using the Karplus-Strong String simulation method.

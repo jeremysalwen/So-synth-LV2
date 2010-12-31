@@ -1,14 +1,14 @@
-Source: so-666-lv2
+Source: so-synth-lv2
 Priority: extra
 Maintainer: Jeremy Salwen<jeremybubs@gmail.com>
-Build-Depends: debhelper (>= 7.0.50~)
+Build-Depends: debhelper (>= 7.0.50~), lv2core
 Standards-Version: 3.8.4
 Section: sound
-Homepage: http://d00m.org/~someone/so666/
-Vcs-Git: git@github.com:jeremysalwen/SO-666-LV2.git
+Homepage: http://d00m.org/~someone/
+Vcs-Git: git@github.com:jeremysalwen/SO-synth-LV2.git
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/so-666.git;a=summary
 
-Package: so-666-lv2
+Package: so-synth-lv2
 Section: sound
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
