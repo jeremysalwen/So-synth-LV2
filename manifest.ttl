@@ -6,4 +6,4 @@
   rdfs:seeAlso <so-666.ttl> .
 <urn:urn:50m30n3:plugins:SO-kl5> a lv2:Plugin;
   lv2:binary   <libsosynth.so>;
-  rdfs:seeAlso <so-kl5.ttl>
+  rdfs:seeAlso <so-kl5.ttl> .
