@@ -61,19 +61,19 @@ typedef struct so_kl5_t {
 	LV2_Event_Feature* event_ref;
 	int midi_event_id;
 
-	double *strings[NUMNOTES];
+	float *strings[NUMNOTES];
 	unsigned int stringpos[NUMNOTES];
 	unsigned int stringlength[NUMNOTES];
-	double stringcutoff[NUMNOTES];
+	float stringcutoff[NUMNOTES];
 	int status[NUMNOTES];
 
 	unsigned int volume;
 	
-	double lpval, lplast;
-	double hpval, hplast;
-	double fcutoff, freso, ssustain,sattack;
+	float lpval, lplast;
+	float hpval, hplast;
+	float fcutoff, freso, ssustain,sattack;
 
 	int channel;
 
-	double* tempstring;
+	float* tempstring;
 } so_kl5;

@@ -5,16 +5,16 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 	so_kl5* so=(so_kl5*)arg;
 	lv2_event_begin(&so->in_iterator,so->MidiIn);
 	
-	double **strings=so->strings;
+	float **strings=so->strings;
 	unsigned int* stringpos=so->stringpos;
 	unsigned int* stringlength=so->stringlength;
-	double* tempstring=so->tempstring;
-	double* stringcutoff=so->stringcutoff;
+	float* tempstring=so->tempstring;
+	float* stringcutoff=so->stringcutoff;
 	float* outbuffer=so->output;
 	int * status=so->status;
 
 	int i, note;
-	double  sample, damp;
+	float  sample, damp;
 
 	for( i=0; i<nframes; i++ ) {
 		while(lv2_event_is_valid(&so->in_iterator)) {
@@ -39,10 +39,10 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 								int j;
 								for( j=0; j<stringlength[note]; j++ )
 								{
-									tempstring[j] = ((double)rand()/(double)RAND_MAX)*2.0-1.0;
+									tempstring[j] = ((float)rand()/(float)RAND_MAX)*2.0-1.0;
 								}
-								double velocity=evt[2];
-								double freq = stringcutoff[note] * 0.25 + velocity/127.0 * 0.2 + so->sattack + 0.1;
+								float velocity=evt[2];
+								float freq = stringcutoff[note] * 0.25 + velocity/127.0 * 0.2 + so->sattack + 0.1;
 
 								for( j=0; j<30; j++ )
 								{
@@ -53,7 +53,7 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 									}
 								}
 
-								double avg = 0.0;
+								float avg = 0.0;
 
 								for( j=0; j<stringlength[note]; j++ )
 								{
@@ -62,7 +62,7 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 
 								avg /= stringlength[note];
 
-								double scale = 0.0;
+								float scale = 0.0;
 
 								for( j=0; j<stringlength[note]; j++ )
 								{
@@ -71,7 +71,7 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 										scale = fabs( tempstring[j] );
 								}
 
-								double min = 10.0;
+								float min = 10.0;
 								int minpos = 0;
 
 								for( j=0; j<stringlength[note]; j++ )
@@ -84,7 +84,7 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 									}
 								}
 
-								double vol = velocity/256.0;
+								float vol = velocity/256.0;
 
 								for( j=0; j<stringlength[note]; j++ )
 								{
@@ -146,7 +146,7 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 				strings[note][stringpos[note]] = strings[note][stringpos[note]]*damp +
 				strings[note][stringlength[note]-1]*(1.0-damp);
 
-			damp = ((double)note/(double)NUMNOTES)*0.009999;
+			damp = ((float)note/(float)NUMNOTES)*0.009999;
 
 			if( status[note] == 0 )
 				strings[note][stringpos[note]] *= 0.8+so->ssustain*0.19+damp;
@@ -163,7 +163,7 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 
 		for( note=0; note<NUMNOTES; note++ )
 		{
-			damp = 1.0-((double)note/(double)NUMNOTES);
+			damp = 1.0-((float)note/(float)NUMNOTES);
 			strings[note][stringpos[note]] += sample*damp*0.001;
 
 			if( fabs( strings[note][stringpos[note]] ) <= 0.00001 )
@@ -222,11 +222,11 @@ LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, con
 	
 	int note;
 	for( note=0; note<NUMNOTES; note++ ) {
-		double freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
-		so->stringcutoff[note] = 0.3 + pow( (double)note / (double)NUMNOTES, 0.5 ) * 0.65;
-		int length = round( (double)s_rate / freq );
+		float freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
+		so->stringcutoff[note] = 0.3 + pow( (float)note / (float)NUMNOTES, 0.5 ) * 0.65;
+		int length = round( (float)s_rate / freq );
 		so->stringlength[note] = length;
-		so->strings[note] = malloc( length * sizeof( double ) );
+		so->strings[note] = malloc( length * sizeof( float ) );
 		if( so->strings[note] == NULL )
 		{
 			fputs( "Error allocating memory\n", stderr );
@@ -241,9 +241,9 @@ LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, con
 		so->status[note] = 0;
 	}
 	
-	double freq = 440.0*pow( 2.0, (BASENOTE-69) / 12.0 );
-	double length = (double)s_rate / freq;
-	so->tempstring = malloc( length * sizeof( double ) );
+	float freq = 440.0*pow( 2.0, (BASENOTE-69) / 12.0 );
+	float length = (float)s_rate / freq;
+	so->tempstring = malloc( length * sizeof( float ) );
 	if( so->tempstring == NULL )
 	{
 		fputs( "Error allocating memory\n", stderr );
