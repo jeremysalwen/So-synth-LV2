@@ -1,4 +1,4 @@
-OBJECTS = so-666.o
+OBJECTS = so-666.o so-kl5.o sosynth.o
 LIBRARY = libsosynth.so
 CC = gcc
 CFLAGS += -Wall -O3 -lm `pkg-config --cflags --libs lv2core` -fPIC
@@ -14,6 +14,8 @@ $(LIBRARY) : $(OBJECTS)
 
 so-666.o : so-666.c
 
+so-kl5.o : so-kl5.c
+
 .PHONY : clean install uninstall
 
 clean :
@@ -24,5 +26,7 @@ install :
 	install $(LIBRARY) $(INSTALLDIR)$(INSTALLNAME)
 	install manifest.ttl $(INSTALLDIR)$(INSTALLNAME)
 	install so-666.ttl $(INSTALLDIR)$(INSTALLNAME)
+	install so-kl5.ttl $(INSTALLDIR)$(INSTALLNAME)
+	
 uninstall :
 	rm -rf $(INSTALLDIR)$(INSTALLNAME)
