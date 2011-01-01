@@ -1,23 +1,23 @@
 #include "so-666.h"
 
-static double dist( double in )
+static float dist( float in )
 {
-	double out;
-	out = tanh( in );
+	float out;
+	out = tanhf( in );
 	return out;
 }
 
 void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 	so_666* so=(so_666*)arg;
 	lv2_event_begin(&so->in_iterator,so->MidiIn);
-	double **strings=so->strings;
+	float **strings=so->strings;
 	unsigned int* stringpos=so->stringpos;
 	unsigned int* stringlength=so->stringlength;
 	float* outbuffer=so->output;
 	int * status=so->status;
 
 	int i, note;
-	double  sample, damp;
+	float  sample, damp;
 
 	for( i=0; i<nframes; i++ ) {
 		while(lv2_event_is_valid(&so->in_iterator)) {
@@ -75,7 +75,7 @@ void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 			}
 			lv2_event_increment(&so->in_iterator);
 		}
-		sample = (((double)rand()/(double)RAND_MAX)*2.0-1.0)*0.001;
+		sample = (((float)rand()/(float)RAND_MAX)*2.0-1.0)*0.001;
 
 		for( note=0; note<NUMNOTES; note++ ) {
 			damp = so->stringcutoff[note];
@@ -157,12 +157,12 @@ LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, con
 	
 	int note;
 	for( note=0; note<NUMNOTES; note++ ) {
-		double freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
-		//so->stringcutoff[note] = ( freq * 16.0 ) / (double)s_rate;
+		float freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
+		//so->stringcutoff[note] = ( freq * 16.0 ) / (float)s_rate;
 		so->stringcutoff[note] = 0.9;
-		int length = (double)s_rate /freq;
+		int length = (float)s_rate /freq;
 		so->stringlength[note] = length;
-		so->strings[note] = malloc( length * sizeof( double ) );
+		so->strings[note] = malloc( length * sizeof( float ) );
 		if( so->strings[note] == NULL )	{
 			fputs( "Error allocating memory\n", stderr );
 			return 0;
