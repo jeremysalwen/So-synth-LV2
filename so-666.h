@@ -61,17 +61,17 @@ typedef struct so_666_t {
 	LV2_Event_Feature* event_ref;
 	int midi_event_id;
 
-	double *strings[NUMNOTES];
+	float *strings[NUMNOTES];
 	unsigned int stringpos[NUMNOTES];
 	unsigned int stringlength[NUMNOTES];
-	double stringcutoff[NUMNOTES];
+	float stringcutoff[NUMNOTES];
 	int status[NUMNOTES];
 
 	unsigned int volume;
 	
-	double lpval, lplast;
-	double hpval, hplast;
-	double fcutoff, freso, ffeedback;
+	float lpval, lplast;
+	float hpval, hplast;
+	float fcutoff, freso, ffeedback;
 
 	int channel;
 } so_666;
