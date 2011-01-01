@@ -7,7 +7,14 @@ static float dist( float in )
 	return out;
 }
 
+inline float feedback_scale(float input) {
+	return 0.01+powf( input, 4.0)*0.9;
+}
+inline float cutoff_scale(float input) {
+	return powf( input, 5.0 );
+}
 void runSO_666( LV2_Handle arg, uint32_t nframes ) {
+	
 	so_666* so=(so_666*)arg;
 	lv2_event_begin(&so->in_iterator,so->MidiIn);
 	float **strings=so->strings;
@@ -19,6 +26,13 @@ void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 	int i, note;
 	float  sample, damp;
 
+	if(*so->controlmode_p>0) {
+		so->ffeedback=feedback_scale(*so->feedback_p);
+		so->fcutoff=cutoff_scale(*so->cutoff_p);
+		so->freso=*so->resonance_p;
+		so->volume=*so->volume_p;
+	}
+	
 	for( i=0; i<nframes; i++ ) {
 		while(lv2_event_is_valid(&so->in_iterator)) {
 			uint8_t* data;
@@ -30,7 +44,7 @@ void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 					break;
 				} else{
 					const uint8_t* evt=(uint8_t*)data;
-					if((evt[0]&MIDI_CHANNELMASK)==so->channel) {
+					if((evt[0]&MIDI_CHANNELMASK)==(int) (*so->channel_p)) {
 						if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEON) 	{
 							note = evt[1];
 							if( (note >= BASENOTE) && ( note < BASENOTE+NUMNOTES ) ) {
@@ -48,26 +62,18 @@ void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 						else if((evt[0]&MIDI_COMMANDMASK)==MIDI_CONTROL )	{
 							if( evt[1] == 74 )	{
 								unsigned int cutoff =evt[2];
-								so->fcutoff = pow( (cutoff+50.0)/200.0, 5.0 );
-								printf( "Cutoff: %i     \r", cutoff );
-								fflush( stdout );
+								so->fcutoff = cutoff_scale((cutoff+50.0)/200.0);
 							}
 							else if( evt[1]== 71 )	{
 								unsigned int resonance = evt[2];
 								so->freso = resonance/127.0;
-								printf( "Resonance: %i     \r", resonance );
-								fflush( stdout );
 							}
 							else if( evt[1] == 7 )	{
 								so->volume = evt[2];
-								printf( "Volume: %i     \r", so->volume );
-								fflush( stdout );
 							}
 							else if( evt[1]== 1 ) {
 								unsigned int feedback =evt[2];
-								so->ffeedback = 0.01+pow( feedback/127.0, 4.0)*0.9;
-								printf( "Feedback: %i    \r", feedback );
-								fflush( stdout );
+								so->ffeedback = feedback_scale (feedback);
 							}
 						}
 					}
@@ -138,9 +144,6 @@ LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, con
 
 	puts( "SO-666 v.1.0 by 50m30n3 2009" );
 
-	so->channel = 0;
-
-	puts( "Initializing synth parameters" );
 	unsigned int feedback,cutoff,resonance;
 	feedback = 32;
 	cutoff = 64;
@@ -180,7 +183,6 @@ LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, con
 }
 void cleanupSO_666(LV2_Handle instance) {
 	so_666* so=(so_666*)instance;
-	puts( "Freeing data" );
 	int note;
 	for(note=0; note<NUMNOTES; note++ )
 	{
@@ -198,7 +200,25 @@ void connectPortSO_666(LV2_Handle instance, uint32_t port, void *data_location) 
 		case PORT_MIDI:
 			so->MidiIn=data_location;
 			break;
+		case PORT_CONTROLMODE:
+			so->controlmode_p=data_location;
+			break;
+		case PORT_FEEDBACK:
+			so->feedback_p=data_location;
+			break;
+		case PORT_RESONANCE:
+			so->resonance_p=data_location;
+			break;
+		case PORT_CUTOFF:
+			so->cutoff_p=data_location;
+			break;
+		case PORT_VOLUME:
+			so->volume_p=data_location;
+			break;
+		case PORT_CHANNEL:
+			so->channel_p=data_location;
+			break;
 		default:
-			fputs("Warning, unconnected port!",stderr);
+			fputs("Warning, unconnected port!\n",stderr);
 	}
 }
