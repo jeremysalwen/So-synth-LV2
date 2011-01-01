@@ -1,6 +1,8 @@
 #include "so-kl5.h"
 
-
+inline float sustain_scale(float input) {
+	return 0.6+pow( input, 0.4)*0.4;
+}
 void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 	so_kl5* so=(so_kl5*)arg;
 	lv2_event_begin(&so->in_iterator,so->MidiIn);
@@ -16,6 +18,14 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 	int i, note;
 	float  sample, damp;
 
+	if(*so->controlmode_p > 0) {
+		so->volume=*so->volume_p;
+		so->fcutoff=*so->cutoff_p;
+		so->sattack=*so->attack_p;
+		so->freso=(*so->resonance_p)*(1.0 - (*so->cutoff_p));
+		so->ssustain=sustain_scale(*so->sustain_p);
+	}
+	
 	for( i=0; i<nframes; i++ ) {
 		while(lv2_event_is_valid(&so->in_iterator)) {
 			uint8_t* data;
@@ -27,7 +37,7 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 					break;
 				} else{
 					const uint8_t* evt=(uint8_t*)data;
-					if((evt[0]&MIDI_CHANNELMASK)==so->channel) {
+					if((evt[0]&MIDI_CHANNELMASK)==(int) (*so->channel_p)) {
 						if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEON) 	{
 							note = evt[1];
 							if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) )
@@ -105,28 +115,17 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 							if( evt[1] == 74 )	{
 								unsigned int cutoff =evt[2];
 								so->fcutoff = (cutoff+5.0)/400.0;
-								printf( "Cutoff: %i     \r", cutoff );
-								fflush( stdout );
 							} else if( evt[1]== 71 )	{
 								unsigned int resonance = evt[2];
 								so->freso = (resonance/160.0)*(1.0-so->fcutoff);
-								printf( "Resonance: %i     \r", resonance );
-								fflush( stdout );
-							} else if( evt[1]== 73 )
-							{
+							} else if( evt[1]== 73 ) {
 								unsigned int attack = evt[2];
 								so->sattack = (attack+5.0)/800.0;
-								printf( "Attack: %i     \r", attack );
-								fflush( stdout );
 							} else if( evt[1] == 7 )	{
 								so->volume = evt[2];
-								printf( "Volume: %i     \r", so->volume );
-								fflush( stdout );
 							} else if( evt[1]== 1 ||evt[1]==64) {
 								unsigned int sustain =evt[2];
-								so->ssustain = 0.6+pow( sustain/127.0, 0.4)*0.4;
-								printf( "Sustain: %i    \r", sustain );
-								fflush( stdout );
+								so->ssustain =sustain_scale(sustain/127.0);
 							}
 						}
 					}
@@ -200,10 +199,7 @@ LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, con
 	}
 
 	puts( "SO-666 v.1.0 by 50m30n3 2009" );
-	
-	so->channel = 0;
-
-	puts( "Initializing synth parameters" );
+		
 	unsigned int cutoff,resonance,sustain,attack;
 	sustain = 0;
 	cutoff = 64;
@@ -255,7 +251,6 @@ LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, con
 }
 void cleanupSO_kl5(LV2_Handle instance) {
 	so_kl5* so=(so_kl5*)instance;
-	puts( "Freeing data");
 	free(so->tempstring);
 	int note;
 	for(note=0; note<NUMNOTES; note++ )
@@ -274,7 +269,28 @@ void connectPortSO_kl5(LV2_Handle instance, uint32_t port, void *data_location) 
 		case PORT_MIDI:
 			so->MidiIn=data_location;
 			break;
+		case PORT_CONTROLMODE:
+			so->controlmode_p=data_location;
+			break;
+		case PORT_VOLUME:
+			so->volume_p=data_location;
+			break;
+		case PORT_SUSTAIN:
+			so->sustain_p=data_location;
+			break;
+		case PORT_CUTOFF:
+			so->cutoff_p=data_location;
+			break;
+		case PORT_RESONANCE:
+			so->resonance_p=data_location;
+			break;
+		case PORT_ATTACK:
+			so->attack_p=data_location;
+			break;
+		case PORT_CHANNEL:
+			so->channel_p=data_location;
+			break;
 		default:
-			fputs("Warning, unconnected port!",stderr);
+			fputs("Warning, unconnected port!\n",stderr);
 	}
 }

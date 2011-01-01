@@ -33,9 +33,15 @@
 #define MIDI_NOTEOFF 0x80
 #define MIDI_CONTROL 0xB0
 
-#define PORT_OUTPUT 0
-#define PORT_MIDI 1
-
+enum PORTS {PORT_OUTPUT=0,
+	PORT_MIDI,
+	PORT_CONTROLMODE,
+	PORT_FEEDBACK,
+	PORT_RESONANCE,
+	PORT_CUTOFF,
+	PORT_VOLUME,
+	PORT_CHANNEL
+};
 
 void runSO_666( LV2_Handle arg, uint32_t nframes );
 LV2_Handle instantiateSO_666(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
@@ -61,6 +67,12 @@ typedef struct so_666_t {
 	LV2_Event_Feature* event_ref;
 	int midi_event_id;
 
+	float* controlmode_p;
+	float*  volume_p;
+	float* feedback_p;
+	float* resonance_p;
+	float* cutoff_p;
+	
 	float *strings[NUMNOTES];
 	unsigned int stringpos[NUMNOTES];
 	unsigned int stringlength[NUMNOTES];
@@ -73,5 +85,5 @@ typedef struct so_666_t {
 	float hpval, hplast;
 	float fcutoff, freso, ffeedback;
 
-	int channel;
+	float* channel_p;
 } so_666;

@@ -33,9 +33,17 @@
 #define MIDI_NOTEOFF 0x80
 #define MIDI_CONTROL 0xB0
 
-#define PORT_OUTPUT 0
-#define PORT_MIDI 1
-
+enum PORTS {
+	PORT_OUTPUT=0,
+	PORT_MIDI,
+	PORT_CONTROLMODE,
+	PORT_SUSTAIN,
+	PORT_RESONANCE,
+	PORT_CUTOFF,
+	PORT_ATTACK,
+	PORT_VOLUME,
+	PORT_CHANNEL
+};
 
 void runSO_kl5( LV2_Handle arg, uint32_t nframes );
 LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
@@ -60,7 +68,14 @@ typedef struct so_kl5_t {
 
 	LV2_Event_Feature* event_ref;
 	int midi_event_id;
-
+	
+	float* controlmode_p;
+	float* volume_p;
+	float* resonance_p;
+	float* cutoff_p;
+	float* sustain_p;
+	float* attack_p;
+	
 	float *strings[NUMNOTES];
 	unsigned int stringpos[NUMNOTES];
 	unsigned int stringlength[NUMNOTES];
@@ -73,7 +88,7 @@ typedef struct so_kl5_t {
 	float hpval, hplast;
 	float fcutoff, freso, ssustain,sattack;
 
-	int channel;
+	float* channel_p;
 
 	float* tempstring;
 } so_kl5;
