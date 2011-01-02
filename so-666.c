@@ -73,7 +73,7 @@ void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 							}
 							else if( evt[1]== 1 ) {
 								unsigned int feedback =evt[2];
-								so->ffeedback = feedback_scale (feedback);
+								so->ffeedback = feedback_scale (feedback/127.0);
 							}
 						}
 					}
