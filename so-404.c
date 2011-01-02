@@ -39,7 +39,7 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 							{
 								so->freq = so->tfreq;
 							}
-							so->amp = evt[2]/127.0;
+							so->amp = ((float)evt[2])/127.0;
 							so->cdelay = 0;
 							so->noteson += 1;
 						}
