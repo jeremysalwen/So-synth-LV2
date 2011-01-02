@@ -19,6 +19,7 @@
 
 #include "so-666.h"
 #include "so-kl5.h"
+#include "so-404.h"
 
 LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) {
 	switch(index) {
@@ -26,6 +27,8 @@ LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) {
 			return &so_666_Descriptor;
 		case 1:
 			return &so_kl5_Descriptor;
+		case 2:
+			return &so_404_Descriptor;
 		default:
 			return NULL;
 	}
