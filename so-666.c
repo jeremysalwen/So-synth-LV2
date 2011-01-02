@@ -42,7 +42,7 @@ void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 			} else if(event->type==so->midi_event_id) {
 				if(event->frames > i) {
 					break;
-				} else if(*so->commandmode_p<=0) {
+				} else if(*so->controlmode_p<=0) {
 					const uint8_t* evt=(uint8_t*)data;
 					if((evt[0]&MIDI_CHANNELMASK)==(int) (*so->channel_p)) {
 						if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEON) 	{
