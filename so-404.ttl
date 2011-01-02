@@ -8,7 +8,8 @@
     doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 	lv2:requiredFeature <http://lv2plug.in/ns/ext/event> ;
     lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;
-
+	lv2:optionalFeature lv2:hardRtCapable;
+	
     lv2:port [
     a lv2:AudioPort ;
     a lv2:OutputPort ;
