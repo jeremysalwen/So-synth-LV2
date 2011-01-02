@@ -263,31 +263,31 @@ void cleanupSO_kl5(LV2_Handle instance) {
 void connectPortSO_kl5(LV2_Handle instance, uint32_t port, void *data_location) {
 	so_kl5* so=(so_kl5*) instance;
 	switch(port) {
-		case PORT_OUTPUT:
+		case KL5_PORT_OUTPUT:
 			so->output=data_location;
 			break;
-		case PORT_MIDI:
+		case KL5_PORT_MIDI:
 			so->MidiIn=data_location;
 			break;
-		case PORT_CONTROLMODE:
+		case KL5_PORT_CONTROLMODE:
 			so->controlmode_p=data_location;
 			break;
-		case PORT_VOLUME:
+		case KL5_PORT_VOLUME:
 			so->volume_p=data_location;
 			break;
-		case PORT_SUSTAIN:
+		case KL5_PORT_SUSTAIN:
 			so->sustain_p=data_location;
 			break;
-		case PORT_CUTOFF:
+		case KL5_PORT_CUTOFF:
 			so->cutoff_p=data_location;
 			break;
-		case PORT_RESONANCE:
+		case KL5_PORT_RESONANCE:
 			so->resonance_p=data_location;
 			break;
-		case PORT_ATTACK:
+		case KL5_PORT_ATTACK:
 			so->attack_p=data_location;
 			break;
-		case PORT_CHANNEL:
+		case KL5_PORT_CHANNEL:
 			so->channel_p=data_location;
 			break;
 		default:

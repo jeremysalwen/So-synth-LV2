@@ -33,35 +33,36 @@
 #define MIDI_NOTEOFF 0x80
 #define MIDI_CONTROL 0xB0
 
-enum KL5_PORTS {
-	KL5_PORT_OUTPUT=0,
-	KL5_PORT_MIDI,
-	KL5_PORT_CONTROLMODE,
-	KL5_PORT_SUSTAIN,
-	KL5_PORT_RESONANCE,
-	KL5_PORT_CUTOFF,
-	KL5_PORT_ATTACK,
-	KL5_PORT_VOLUME,
-	KL5_PORT_CHANNEL
+enum PORTS_404 {
+	PORT_404_OUTPUT=0,
+	PORT_404_MIDI,
+	PORT_404_CONTROLMODE,
+	PORT_404_VOLUME,
+	PORT_404_CUTOFF,
+	PORT_404_RESONANCE,
+	PORT_404_ENVELOPE,
+	PORT_404_PORTAMENTO,
+	PORT_404_RELEASE,
+	PORT_404_CHANNEL
 };
 
-void runSO_kl5( LV2_Handle arg, uint32_t nframes );
-LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
-void cleanupSO_kl5(LV2_Handle instance);
-void connectPortSO_kl5(LV2_Handle instance, uint32_t port, void *data_location);
+void runSO_404( LV2_Handle arg, uint32_t nframes );
+LV2_Handle instantiateSO_404(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
+void cleanupSO_404(LV2_Handle instance);
+void connectPortSO_404(LV2_Handle instance, uint32_t port, void *data_location);
 
-static LV2_Descriptor so_kl5_Descriptor= {
-	.URI="urn:50m30n3:plugins:SO-kl5",
-	.instantiate=instantiateSO_kl5,
-	.connect_port=connectPortSO_kl5,
+static LV2_Descriptor so_404_Descriptor= {
+	.URI="urn:50m30n3:plugins:SO-404",
+	.instantiate=instantiateSO_404,
+	.connect_port=connectPortSO_404,
 	.activate=NULL,
-	.run=runSO_kl5,
+	.run=runSO_404,
 	.deactivate=NULL,
-	.cleanup=cleanupSO_kl5,
+	.cleanup=cleanupSO_404,
 	.extension_data=NULL,
 };
 
-typedef struct so_kl5_t {
+typedef struct so_404_t {
 	float* output;
 	LV2_Event_Buffer *MidiIn;
 	LV2_Event_Iterator in_iterator;
@@ -70,25 +71,36 @@ typedef struct so_kl5_t {
 	int midi_event_id;
 	
 	float* controlmode_p;
-	float* volume_p;
-	float* resonance_p;
 	float* cutoff_p;
-	float* sustain_p;
-	float* attack_p;
-	
-	float *strings[NUMNOTES];
-	unsigned int stringpos[NUMNOTES];
-	unsigned int stringlength[NUMNOTES];
-	float stringcutoff[NUMNOTES];
-	int status[NUMNOTES];
-
-	unsigned int volume;
-	
-	float lpval, lplast;
-	float hpval, hplast;
-	float fcutoff, freso, ssustain,sattack;
-
+	float* portamento_p;
+	float* release_p;
+	float* volume_p;
+	float* envmod_p;
+	float* resonance_p;
 	float* channel_p;
+		
+	float freq, tfreq;
+	
+	double samplerate;
+	
+	unsigned int cdelay;
+	
+	unsigned int cutoff;
+	unsigned int resonance;
+	unsigned int volume;
+	unsigned int portamento;
+	unsigned int release;
+	unsigned int envmod;
 
-	float* tempstring;
-} so_kl5;
+	float phase;
+	float amp;
+	float lastsample;
+	
+	float fcutoff;
+	float fspeed;
+	float fpos;
+	float freso;
+	
+	int noteson;
+
+} so_404;
