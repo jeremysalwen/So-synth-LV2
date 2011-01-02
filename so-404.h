@@ -37,11 +37,12 @@ enum PORTS {
 	PORT_OUTPUT=0,
 	PORT_MIDI,
 	PORT_CONTROLMODE,
-	PORT_SUSTAIN,
-	PORT_RESONANCE,
-	PORT_CUTOFF,
-	PORT_ATTACK,
 	PORT_VOLUME,
+	PORT_CUTOFF,
+	PORT_RESONANCE,
+	PORT_ENVELOPE,
+	PORT_PORTAMENTO,
+	PORT_RELEASE,
 	PORT_CHANNEL
 };
 
@@ -70,25 +71,32 @@ typedef struct so_404_t {
 	int midi_event_id;
 	
 	float* controlmode_p;
-	float* volume_p;
-	float* resonance_p;
 	float* cutoff_p;
-	float* sustain_p;
-	float* attack_p;
+	float* portamento_p;
+	float* release_p;
+	float* volume_p;
+	float* envmod_p;
+	float* resonance_p;
+		
+	float freq, tfreq;
+	unsigned int cdelay;
 	
-	float *strings[NUMNOTES];
-	unsigned int stringpos[NUMNOTES];
-	unsigned int stringlength[NUMNOTES];
-	float stringcutoff[NUMNOTES];
-	int status[NUMNOTES];
-
+	unsigned int cutoff;
+	unsigned int resonance;
 	unsigned int volume;
+	unsigned int portamento;
+	unsigned int release;
+	unsigned int envmod;
+
+	float phase;
+	float amp;
+	float lastsample;
 	
-	float lpval, lplast;
-	float hpval, hplast;
-	float fcutoff, freso, ssustain,sattack;
+	float fcutoff;
+	float fspeed;
+	float fpos;
+	float freso;
+	
+	int noteson;
 
-	float* channel_p;
-
-	float* tempstring;
 } so_404;

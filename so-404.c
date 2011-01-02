@@ -1,31 +1,14 @@
 #include "so-404.h"
 
-inline float sustain_scale(float input) {
-	return 0.6+pow( input, 0.4)*0.4;
+inline float midi_to_hz(unsigned int note) {
+	return 440.0*powf( 2.0, (note-69) / 12.0 );
 }
 
 void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 	so_404* so=(so_404*)arg;
 	lv2_event_begin(&so->in_iterator,so->MidiIn);
 	
-	float **strings=so->strings;
-	unsigned int* stringpos=so->stringpos;
-	unsigned int* stringlength=so->stringlength;
-	float* tempstring=so->tempstring;
-	float* stringcutoff=so->stringcutoff;
-	float* outbuffer=so->output;
-	int * status=so->status;
-
-	int i, note;
-	float  sample, damp;
-
-	if(*so->controlmode_p > 0) {
-		so->volume=*so->volume_p;
-		so->fcutoff=*so->cutoff_p;
-		so->sattack=*so->attack_p;
-		so->freso=(*so->resonance_p)*(1.0 - (*so->cutoff_p));
-		so->ssustain=sustain_scale(*so->sustain_p);
-	}
+	int i;
 	
 	for( i=0; i<nframes; i++ ) {
 		while(lv2_event_is_valid(&so->in_iterator)) {
@@ -41,92 +24,40 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 					if((evt[0]&MIDI_CHANNELMASK)==(int) (*so->channel_p)) {
 						if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEON) 	{
 							note = evt[1];
-							if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) )
+							so->tfreq=midi_to_hz(note);
+							if( so->noteson == 0 )
 							{
-								note -= BASENOTE;
-
-								status[note] = 1;
-								
-								int j;
-								for( j=0; j<stringlength[note]; j++ )
-								{
-									tempstring[j] = ((float)rand()/(float)RAND_MAX)*2.0-1.0;
-								}
-								float velocity=evt[2];
-								float freq = stringcutoff[note] * 0.25 + velocity/127.0 * 0.2 + so->sattack + 0.1;
-
-								for( j=0; j<30; j++ )
-								{
-									tempstring[0] = tempstring[0]*freq + tempstring[stringlength[note]-1]*(1.0-freq);
-									int k;
-									for( k=1; k<stringlength[note]; k++ )
-									{
-										tempstring[k] = tempstring[k]*freq + tempstring[(k-1)%stringlength[note]]*(1.0-freq);
-									}
-								}
-
-								float avg = 0.0;
-
-								for( j=0; j<stringlength[note]; j++ )
-								{
-									avg += tempstring[j];
-								}
-
-								avg /= stringlength[note];
-
-								float scale = 0.0;
-
-								for( j=0; j<stringlength[note]; j++ )
-								{
-									tempstring[j] -= avg;
-									if( fabs( tempstring[j] ) > scale )
-										scale = fabs( tempstring[j] );
-								}
-
-								float min = 10.0;
-								int minpos = 0;
-
-								for( j=0; j<stringlength[note]; j++ )
-								{
-									tempstring[j] /= scale;
-									if( fabs( tempstring[j] ) + fabs( tempstring[j] - tempstring[j-1] ) * 5.0 < min )
-									{
-										min = fabs( tempstring[j] ) + fabs( tempstring[j] - tempstring[j-1] ) * 5.0;
-										minpos = j;
-									}
-								}
-
-								float vol = velocity/256.0;
-
-								for( j=0; j<stringlength[note]; j++ )
-								{
-									strings[note][(stringpos[note]+j)%stringlength[note]] += tempstring[(j+minpos)%stringlength[note]]*vol;
-								}
+								so->freq = so->tfreq
 							}
+							so->amp = evt[2]/127.0;
+							so->cdelay = 0;
+							so->noteson += 1;
 						}
 						else if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEOFF )	{
 							note = evt[1];
-							if( ( note >= BASENOTE ) && ( note < BASENOTE+NUMNOTES ) )
-							{
-								note -= BASENOTE;
-								status[note] = 0;
-							}
+							noteson -= 1;
 						}
 						else if((evt[0]&MIDI_COMMANDMASK)==MIDI_CONTROL )	{
-							if( evt[1] == 74 )	{
-								unsigned int cutoff =evt[2];
-								so->fcutoff = (cutoff+5.0)/400.0;
-							} else if( evt[1]== 71 )	{
-								unsigned int resonance = evt[2];
-								so->freso = (resonance/160.0)*(1.0-so->fcutoff);
-							} else if( evt[1]== 73 ) {
-								unsigned int attack = evt[2];
-								so->sattack = (attack+5.0)/800.0;
-							} else if( evt[1] == 7 )	{
-								so->volume = evt[2];
-							} else if( evt[1]== 1 ||evt[1]==64) {
-								unsigned int sustain =evt[2];
-								so->ssustain =sustain_scale(sustain/127.0);
+							unsigned int command_val=evt[2];
+							switch(evt[1]) {
+								case 74:
+									so->cutoff =command_val;
+									break;
+								case 65:
+									so->portamento = command_val;
+									break;
+								case 72:
+									so->release = command_val;
+									break;
+								case 7:
+									so->volume = command_val;
+									break;
+								case 79:
+									so->envmod = command_val;
+									break;
+								case 71:
+									so->resonance = command_val;
+									break;
 							}
 						}
 					}
@@ -134,52 +65,35 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 			}
 			lv2_event_increment(&so->in_iterator);
 		}
-		sample = 0.0;
-
-		for( note=0; note<NUMNOTES; note++ )
+		if( cdelay <= 0 )
 		{
-			damp = stringcutoff[note];
-
-			if( stringpos[note] > 0 )
-				strings[note][stringpos[note]] = strings[note][stringpos[note]]*damp +
-				strings[note][stringpos[note]-1]*(1.0-damp);
-			else
-				strings[note][stringpos[note]] = strings[note][stringpos[note]]*damp +
-				strings[note][stringlength[note]-1]*(1.0-damp);
-
-			damp = ((float)note/(float)NUMNOTES)*0.009999;
-
-			if( status[note] == 0 )
-				strings[note][stringpos[note]] *= 0.8+so->ssustain*0.19+damp;
-			else
-				strings[note][stringpos[note]] *= 0.99+damp;
-
-			sample += strings[note][stringpos[note]];
+			freq = ((portamento/127.0)*0.9)*freq + (1.0-((portamento/127.0)*0.9))*tfreq;
+			amp *= 0.8+(release/127.0)/5.1;
+			fcutoff = pow(cutoff/127.0,5.0)+amp*amp*pow(envmod/128.0,2.0);
+			if( fcutoff > 1.0 ) fcutoff = 1.0;
+			fcutoff = sin(fcutoff*M_PI/2.0);
+			freso = pow(resonance/127.0,0.25);
+			cdelay = samplerate/100;
 		}
+		cdelay--;
+		
+		max = samplerate / freq;
+		float sample = (phase/max)*(phase/max)-0.25;
+		phase++;
+		if( phase >= max )
+		phase -= max;
+		
+		sample *= amp;
 
-		so->hpval += (sample-(so->hplast)) * 0.00001;
-		so->hplast += so->hpval;
-		so->hpval *= 0.96;
-		sample -= so->hplast;
+		fpos += fspeed;
+		fspeed *= freso;
+		fspeed += (sample-fpos)*fcutoff;
+		sample = fpos;
 
-		for( note=0; note<NUMNOTES; note++ )
-		{
-			damp = 1.0-((float)note/(float)NUMNOTES);
-			strings[note][stringpos[note]] += sample*damp*0.001;
+		sample = sample*0.5+lastsample*0.5;
+		lastsample = sample;
 
-			if( fabs( strings[note][stringpos[note]] ) <= 0.00001 )
-				strings[note][stringpos[note]] = 0.0;
-
-			stringpos[note]++;
-			if( stringpos[note] >= stringlength[note] ) stringpos[note] = 0;
-		}
-
-		so->lpval += (sample-so->lplast) * so->fcutoff;
-		so->lplast += so->lpval;
-		so->lpval *= so->freso;
-		sample = so->lplast;
-
-		outbuffer[i] = sample * (so->volume/127.0);
+		outbuffer[i] = sample * (volume/127.0);
 	}
 }
 
@@ -199,66 +113,30 @@ LV2_Handle instantiateSO_404(const LV2_Descriptor *descriptor,double s_rate, con
 															                                                                             }
 	}
 
-	puts( "SO-666 v.1.0 by 50m30n3 2009" );
+	puts( "SO-404 v.1.0 by 50m30n3 2009" );
 		
-	unsigned int cutoff,resonance,sustain,attack;
-	sustain = 0;
-	cutoff = 64;
-	resonance = 100;
-	attack=4;
+	so->phase = 0.0;
+	so->freq = 440.0;
+	so->tfreq = 440.0;
+	so->amp = 0.0;
+	so->fcutoff = 0.0;
+	so->fspeed = 0.0;
+	so->fpos = 0.0;
+	so->lastsample = 0.0;
+	so->noteson = 0;
+	so->cdelay = s_rate/100;
+	
+	so->release = 100;
+	so->cutoff = 50;
+	so->envmod = 80;
+	so->resonance = 100;
 	so->volume = 100;
-
-	so->lplast=0;
-	so->lpval=0;
-	so->hplast=0;
-	so->hpval=0;
+	so->portamento = 64;
 	
-	so->fcutoff = (cutoff+5.0)/400.0;
-	so->sattack = (attack+5.0)/800.0;
-	so->freso = (resonance/160.0)*(1.0-so->fcutoff);
-	so->ssustain = 0.6+pow( sustain/127.0, 0.4);
-	
-	int note;
-	for( note=0; note<NUMNOTES; note++ ) {
-		float freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
-		so->stringcutoff[note] = 0.3 + pow( (float)note / (float)NUMNOTES, 0.5 ) * 0.65;
-		int length = round( (float)s_rate / freq );
-		so->stringlength[note] = length;
-		so->strings[note] = malloc( length * sizeof( float ) );
-		if( so->strings[note] == NULL )
-		{
-			fputs( "Error allocating memory\n", stderr );
-			return 0;
-		}
-		int i;
-		for( i=0; i<length; i++ )
-		{
-			so->strings[note][i] = 0.0;
-		}
-		so->stringpos[note] = 0;
-		so->status[note] = 0;
-	}
-	
-	float freq = 440.0*pow( 2.0, (BASENOTE-69) / 12.0 );
-	float length = (float)s_rate / freq;
-	so->tempstring = malloc( length * sizeof( float ) );
-	if( so->tempstring == NULL )
-	{
-		fputs( "Error allocating memory\n", stderr );
-		return 0;
-	}
-
 	return so;
 }
 void cleanupSO_404(LV2_Handle instance) {
-	so_404* so=(so_404*)instance;
-	free(so->tempstring);
-	int note;
-	for(note=0; note<NUMNOTES; note++ )
-	{
-		free( so->strings[note] );
-	}
-	free(so);
+	free(instance);
 }
 
 void connectPortSO_404(LV2_Handle instance, uint32_t port, void *data_location) {
@@ -276,17 +154,20 @@ void connectPortSO_404(LV2_Handle instance, uint32_t port, void *data_location) 
 		case PORT_VOLUME:
 			so->volume_p=data_location;
 			break;
-		case PORT_SUSTAIN:
-			so->sustain_p=data_location;
-			break;
 		case PORT_CUTOFF:
 			so->cutoff_p=data_location;
 			break;
 		case PORT_RESONANCE:
 			so->resonance_p=data_location;
 			break;
-		case PORT_ATTACK:
-			so->attack_p=data_location;
+		case PORT_ENVELOPE:
+			so->channel_p=data_location;
+			break;
+		case PORT_PORTAMENTO:
+			so->portamento_p=data_location;
+			break;
+		case PORT_RELEASE:
+			so->release_p=data_location;
 			break;
 		case PORT_CHANNEL:
 			so->channel_p=data_location;
