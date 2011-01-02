@@ -33,17 +33,17 @@
 #define MIDI_NOTEOFF 0x80
 #define MIDI_CONTROL 0xB0
 
-enum PORTS {
-	PORT_OUTPUT=0,
-	PORT_MIDI,
-	PORT_CONTROLMODE,
-	PORT_VOLUME,
-	PORT_CUTOFF,
-	PORT_RESONANCE,
-	PORT_ENVELOPE,
-	PORT_PORTAMENTO,
-	PORT_RELEASE,
-	PORT_CHANNEL
+enum PORTS_404 {
+	PORT_404_OUTPUT=0,
+	PORT_404_MIDI,
+	PORT_404_CONTROLMODE,
+	PORT_404_VOLUME,
+	PORT_404_CUTOFF,
+	PORT_404_RESONANCE,
+	PORT_404_ENVELOPE,
+	PORT_404_PORTAMENTO,
+	PORT_404_RELEASE,
+	PORT_404_CHANNEL
 };
 
 void runSO_404( LV2_Handle arg, uint32_t nframes );
@@ -77,8 +77,12 @@ typedef struct so_404_t {
 	float* volume_p;
 	float* envmod_p;
 	float* resonance_p;
+	float* channel_p;
 		
 	float freq, tfreq;
+	
+	double samplerate;
+	
 	unsigned int cdelay;
 	
 	unsigned int cutoff;

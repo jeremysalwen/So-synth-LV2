@@ -8,8 +8,18 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 	so_404* so=(so_404*)arg;
 	lv2_event_begin(&so->in_iterator,so->MidiIn);
 	
-	int i;
+	float* outbuffer=so->output;
+
+	if(*so->controlmode_p >0) {
+		so->cutoff=*so->cutoff_p;
+		so->portamento=*so->portamento_p;
+		so->release=*so->release_p;
+		so->volume=*so->volume_p;
+		so->envmod=*so->envmod_p;
+		so->resonance=*so->resonance_p;
+	}
 	
+	int i;
 	for( i=0; i<nframes; i++ ) {
 		while(lv2_event_is_valid(&so->in_iterator)) {
 			uint8_t* data;
@@ -23,19 +33,18 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 					const uint8_t* evt=(uint8_t*)data;
 					if((evt[0]&MIDI_CHANNELMASK)==(int) (*so->channel_p)) {
 						if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEON) 	{
-							note = evt[1];
+							unsigned int note = evt[1];
 							so->tfreq=midi_to_hz(note);
 							if( so->noteson == 0 )
 							{
-								so->freq = so->tfreq
+								so->freq = so->tfreq;
 							}
 							so->amp = evt[2]/127.0;
 							so->cdelay = 0;
 							so->noteson += 1;
 						}
 						else if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEOFF )	{
-							note = evt[1];
-							noteson -= 1;
+							so->noteson -= 1;
 						}
 						else if((evt[0]&MIDI_COMMANDMASK)==MIDI_CONTROL )	{
 							unsigned int command_val=evt[2];
@@ -65,35 +74,37 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 			}
 			lv2_event_increment(&so->in_iterator);
 		}
-		if( cdelay <= 0 )
+		if( so->cdelay <= 0 )
 		{
-			freq = ((portamento/127.0)*0.9)*freq + (1.0-((portamento/127.0)*0.9))*tfreq;
-			amp *= 0.8+(release/127.0)/5.1;
-			fcutoff = pow(cutoff/127.0,5.0)+amp*amp*pow(envmod/128.0,2.0);
-			if( fcutoff > 1.0 ) fcutoff = 1.0;
-			fcutoff = sin(fcutoff*M_PI/2.0);
-			freso = pow(resonance/127.0,0.25);
-			cdelay = samplerate/100;
+			so->freq = ((so->portamento/127.0)*0.9)*so->freq + (1.0-((so->portamento/127.0)*0.9))*so->tfreq;
+			so->amp *= 0.8+(so->release/127.0)/5.1;
+			so->fcutoff = powf(so->cutoff/127.0,5.0)+so->amp*so->amp*powf(so->envmod/128.0,2.0);
+			if( so->fcutoff > 1.0 ) {
+				so->fcutoff = 1.0;
+			}
+			so->fcutoff = sin(so->fcutoff*M_PI/2.0);
+			so->freso = powf(so->resonance/127.0,0.25);
+			so->cdelay = so->samplerate/100;
 		}
-		cdelay--;
+		so->cdelay--;
 		
-		max = samplerate / freq;
-		float sample = (phase/max)*(phase/max)-0.25;
-		phase++;
-		if( phase >= max )
-		phase -= max;
+		float max = so->samplerate / so->freq;
+		float sample = (so->phase/max)*(so->phase/max)-0.25;
+		so->phase++;
+		if( so->phase >= max )
+		so->phase -= max;
 		
-		sample *= amp;
+		sample *= so->amp;
 
-		fpos += fspeed;
-		fspeed *= freso;
-		fspeed += (sample-fpos)*fcutoff;
-		sample = fpos;
+		so->fpos += so->fspeed;
+		so->fspeed *= so->freso;
+		so->fspeed += (sample-so->fpos)*so->fcutoff;
+		sample = so->fpos;
 
-		sample = sample*0.5+lastsample*0.5;
-		lastsample = sample;
+		sample = sample*0.5+so->lastsample*0.5;
+		so->lastsample = sample;
 
-		outbuffer[i] = sample * (volume/127.0);
+		outbuffer[i] = sample * (so->volume/127.0);
 	}
 }
 
@@ -125,6 +136,7 @@ LV2_Handle instantiateSO_404(const LV2_Descriptor *descriptor,double s_rate, con
 	so->lastsample = 0.0;
 	so->noteson = 0;
 	so->cdelay = s_rate/100;
+	so->samplerate=s_rate;
 	
 	so->release = 100;
 	so->cutoff = 50;
@@ -142,34 +154,34 @@ void cleanupSO_404(LV2_Handle instance) {
 void connectPortSO_404(LV2_Handle instance, uint32_t port, void *data_location) {
 	so_404* so=(so_404*) instance;
 	switch(port) {
-		case PORT_OUTPUT:
+		case PORT_404_OUTPUT:
 			so->output=data_location;
 			break;
-		case PORT_MIDI:
+		case PORT_404_MIDI:
 			so->MidiIn=data_location;
 			break;
-		case PORT_CONTROLMODE:
+		case PORT_404_CONTROLMODE:
 			so->controlmode_p=data_location;
 			break;
-		case PORT_VOLUME:
+		case PORT_404_VOLUME:
 			so->volume_p=data_location;
 			break;
-		case PORT_CUTOFF:
+		case PORT_404_CUTOFF:
 			so->cutoff_p=data_location;
 			break;
-		case PORT_RESONANCE:
+		case PORT_404_RESONANCE:
 			so->resonance_p=data_location;
 			break;
-		case PORT_ENVELOPE:
-			so->channel_p=data_location;
+		case PORT_404_ENVELOPE:
+			so->envmod_p=data_location;
 			break;
-		case PORT_PORTAMENTO:
+		case PORT_404_PORTAMENTO:
 			so->portamento_p=data_location;
 			break;
-		case PORT_RELEASE:
+		case PORT_404_RELEASE:
 			so->release_p=data_location;
 			break;
-		case PORT_CHANNEL:
+		case PORT_404_CHANNEL:
 			so->channel_p=data_location;
 			break;
 		default:
