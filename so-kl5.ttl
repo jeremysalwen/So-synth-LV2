@@ -81,7 +81,7 @@
     ],[
     a lv2:InputPort;
     a lv2:ControlPort;
-    lv2:index 7;
+    lv2:index 8;
     lv2:symbol "channel";
     lv2:name "Midi Channel";
     lv2:portProperty lv2:integer;
