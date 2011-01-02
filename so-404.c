@@ -1,6 +1,6 @@
 #include "so-404.h"
 
-inline float midi_to_hz(unsigned int note) {
+inline float midi_to_hz(int note) {
 	return 440.0*powf( 2.0, (note-69) / 12.0 );
 }
 
