@@ -1,7 +1,7 @@
 #include "so-kl5.h"
 
 inline float sustain_scale(float input) {
-	return 0.6+pow( input, 0.4)*0.4;
+	return 0.6+powf( input, 0.4)*0.4;
 }
 void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 	so_kl5* so=(so_kl5*)arg;
@@ -215,12 +215,12 @@ LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, con
 	so->fcutoff = (cutoff+5.0)/400.0;
 	so->sattack = (attack+5.0)/800.0;
 	so->freso = (resonance/160.0)*(1.0-so->fcutoff);
-	so->ssustain = 0.6+pow( sustain/127.0, 0.4);
+	so->ssustain = 0.6+powf( sustain/127.0, 0.4);
 	
 	int note;
 	for( note=0; note<NUMNOTES; note++ ) {
-		float freq = 440.0*pow( 2.0, (note+BASENOTE-69) / 12.0 );
-		so->stringcutoff[note] = 0.3 + pow( (float)note / (float)NUMNOTES, 0.5 ) * 0.65;
+		float freq = 440.0*powf( 2.0, (note+BASENOTE-69) / 12.0 );
+		so->stringcutoff[note] = 0.3 + powf( (float)note / (float)NUMNOTES, 0.5 ) * 0.65;
 		int length = round( (float)s_rate / freq );
 		so->stringlength[note] = length;
 		so->strings[note] = malloc( length * sizeof( float ) );
@@ -238,7 +238,7 @@ LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, con
 		so->status[note] = 0;
 	}
 	
-	float freq = 440.0*pow( 2.0, (BASENOTE-69) / 12.0 );
+	float freq = 440.0*powf( 2.0, (BASENOTE-69) / 12.0 );
 	float length = (float)s_rate / freq;
 	so->tempstring = malloc( length * sizeof( float ) );
 	if( so->tempstring == NULL )
