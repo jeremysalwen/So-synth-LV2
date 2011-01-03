@@ -2,7 +2,7 @@ OBJECTS = so-666.o so-kl5.o so-404.o sosynth.o
 LIBRARY = libsosynth.so
 TTLS = so-666.ttl so-kl5.ttl so-404.ttl manifest.ttl
 CC = gcc
-CFLAGS += -Wall -O3 -lm `pkg-config --cflags --libs lv2core` -fPIC
+CFLAGS += -Wall -O3 -ffast-math -lm `pkg-config --cflags --libs lv2core` -fPIC
 INSTALLDIR = $(DESTDIR)/usr/lib/lv2/
 INSTALLNAME = so-synth.lv2/
 $(LIBRARY) : $(OBJECTS)
