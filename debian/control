@@ -15,4 +15,6 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: A set of synthesizers for the LV2 plugin format
  This package is an unofficial port of the SO-666 synthesizer
  to the LV2 plugin format.  In order to use it, you need a host
- for LV2 plugins such as Ardour, Qtractor, or Ingen
+ for LV2 plugins such as Ardour, Qtractor, or Ingen.  This package
+ contains three synthesizers, a feedback drone synthesizer, a
+ piano synthesizer, and a bassline synthesizer.
