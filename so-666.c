@@ -42,7 +42,7 @@ void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 			} else if(event->type==so->midi_event_id) {
 				if(event->frames > i) {
 					break;
-				} else if(*so->controlmode_p<=0) {
+				} else {
 					const uint8_t* evt=(uint8_t*)data;
 					if((evt[0]&MIDI_CHANNELMASK)==(int) (*so->channel_p)) {
 						if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEON) 	{
@@ -59,7 +59,7 @@ void runSO_666( LV2_Handle arg, uint32_t nframes ) {
 								status[note] = 0;
 							}
 						}
-						else if((evt[0]&MIDI_COMMANDMASK)==MIDI_CONTROL )	{
+						else if((*so->controlmode_p<=0) && (evt[0]&MIDI_COMMANDMASK)==MIDI_CONTROL)	{
 							if( evt[1] == 74 )	{
 								unsigned int cutoff =evt[2];
 								so->fcutoff = cutoff_scale((cutoff+50.0)/200.0);
