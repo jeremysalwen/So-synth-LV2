@@ -117,7 +117,7 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 								so->fcutoff = (cutoff+5.0)/400.0;
 							} else if( evt[1]== 71 )	{
 								unsigned int resonance = evt[2];
-								so->freso = (resonance/160.0)*(1.0-so->fcutoff);
+								so->freso = (resonance/140.0)*(1.0-so->fcutoff);
 							} else if( evt[1]== 73 ) {
 								unsigned int attack = evt[2];
 								so->sattack = (attack+5.0)/800.0;
@@ -146,7 +146,7 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 				strings[note][stringpos[note]] = strings[note][stringpos[note]]*damp +
 				strings[note][stringlength[note]-1]*(1.0-damp);
 
-			damp = ((float)note/(float)NUMNOTES)*0.009999;
+			damp = ((float)note/(float)NUMNOTES)*0.0049995 + 0.0049995;
 
 			if( status[note] == 0 )
 				strings[note][stringpos[note]] *= 0.8+so->ssustain*0.19+damp;
@@ -156,16 +156,8 @@ void runSO_kl5( LV2_Handle arg, uint32_t nframes ) {
 			sample += strings[note][stringpos[note]];
 		}
 
-		so->hpval += (sample-(so->hplast)) * 0.00001;
-		so->hplast += so->hpval;
-		so->hpval *= 0.96;
-		sample -= so->hplast;
-
 		for( note=0; note<NUMNOTES; note++ )
 		{
-			damp = 1.0-((float)note/(float)NUMNOTES);
-			strings[note][stringpos[note]] += sample*damp*0.001;
-
 			if( fabs( strings[note][stringpos[note]] ) <= 0.00001 )
 				strings[note][stringpos[note]] = 0.0;
 
@@ -209,8 +201,6 @@ LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, con
 
 	so->lplast=0;
 	so->lpval=0;
-	so->hplast=0;
-	so->hpval=0;
 	
 	so->fcutoff = (cutoff+5.0)/400.0;
 	so->sattack = (attack+5.0)/800.0;
@@ -220,7 +210,7 @@ LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, con
 	int note;
 	for( note=0; note<NUMNOTES; note++ ) {
 		float freq = 440.0*powf( 2.0, (note+BASENOTE-69) / 12.0 );
-		so->stringcutoff[note] = 0.3 + powf( (float)note / (float)NUMNOTES, 0.5 ) * 0.65;
+		so->stringcutoff[note] = 0.5 + pow( (double)note / (double)NUMNOTES, 0.5 ) * 0.45;
 		int length = round( (float)s_rate / freq );
 		so->stringlength[note] = length;
 		so->strings[note] = malloc( length * sizeof( float ) );

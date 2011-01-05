@@ -85,7 +85,6 @@ typedef struct so_kl5_t {
 	unsigned int volume;
 	
 	float lpval, lplast;
-	float hpval, hplast;
 	float fcutoff, freso, ssustain,sattack;
 
 	float* channel_p;
