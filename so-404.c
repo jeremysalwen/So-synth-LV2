@@ -38,9 +38,9 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 							if( so->noteson == 0 )
 							{
 								so->freq = so->tfreq;
+								so->amp = ((float)evt[2])/127.0;
+								so->cdelay = 0;
 							}
-							so->amp = ((float)evt[2])/127.0;
-							so->cdelay = 0;
 							so->noteson += 1;
 						}
 						else if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEOFF )	{
@@ -77,7 +77,10 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 		if( so->cdelay <= 0 )
 		{
 			so->freq = ((so->portamento/127.0)*0.9)*so->freq + (1.0-((so->portamento/127.0)*0.9))*so->tfreq;
-			so->amp *= 0.8+(so->release/127.0)/5.1;
+			if( so->noteson > 0 )
+				so->amp *= 0.8+(so->release/127.0)/5.1;
+			else
+				so->amp *= 0.5;
 			so->fcutoff = powf(so->cutoff/127.0,5.0)+so->amp*so->amp*powf(so->envmod/128.0,2.0);
 			if( so->fcutoff > 1.0 ) {
 				so->fcutoff = 1.0;
