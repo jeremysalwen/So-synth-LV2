@@ -1,5 +1,22 @@
 LV2 ports by Jeremy Salwen 2010
 
+This is a package of three LV2 plugin synthesizers.  To use them, you need an
+LV2 host which works with MIDI synthesizers.  The different parameters (listed
+below for each synthesizer) can be controlled either from MIDI CC events through
+the "midi in" port, or they can be controlled using the LV2 control ports.  
+These two options are exclusive, and can be switched between by the 
+"Control Mode" option.
+
+For installation instructions, see the INSTALL file.
+
+This software is licensed under the GNU GPL V3 see LICENSE for details.
+Bug reports, questions and death threats to someone@d00m.org and/or
+jeremysalwen@gmail.com.
+
+The following are relevant excerpts from the original synthesizers released by
+50m30n3.
+
+
 *******SO-666 v.1.0 by 50m30n3 2009*******
 
 SO-666 is a feedback based drone synthesizer building upon the SO-KL5 synth.
@@ -7,18 +24,12 @@ It creates haunting cacophonic howls and drones.
 It's a bit hard to play but making good use of the modwheel will help keep the
 sound in control.
 
-All synthesis parameters can be edited using MIDI CC messages.
-
 Parameter list:
 CC#1	-	Feedback (mod wheel)
 CC#7	-	Volume
 CC#71	-	Filter Resonance
 CC#74	-	Filter Cutoff
 
-To compile the code you need the ALSA and Jack developement files.
-
-This software is licensed under the GNU GPL V3 see LICENSE for details.
-Bug reports, questions and death threats to someone@d00m.org.
 
 
 *******SO-KL5 v.1.1 by 50m30n3 2010*******
@@ -42,8 +53,6 @@ SO-404 is a simple bass synthesizer using 1 oscillator and 1 filter.
 The oscillator is a simple saw wave oscillator and the filter is a simple
 resonant lowpass filter. You know, like that other very good and famous synth
 with a similar name. Just not as good and famous.
-
-All synthesis parameters can be edited using MIDI CC messages.
 
 Parameter list:
 CC#7	-	Volume
