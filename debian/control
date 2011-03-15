@@ -1,6 +1,6 @@
 Source: so-synth-lv2
 Priority: extra
-Maintainer: Jeremy Salwen<jeremybubs@gmail.com>
+Maintainer: Jeremy Salwen <jeremysalwen@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~), lv2core
 Standards-Version: 3.8.4
 Section: sound

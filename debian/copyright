@@ -1,6 +1,6 @@
 This work was packaged for Debian by:
 
-    Jeremy <jeremy@susan> on Wed, 29 Dec 2010 01:47:38 -0500
+    Jeremy Salwen <jeremysalwen@gmail.com> on Wed, 29 Dec 2010 01:47:38 -0500
 
 It was downloaded from:
 
@@ -11,8 +11,8 @@ The LV2 repackaging comes from:
 
 Upstream Author(s):
 
-   	50m30n3 <someone@d00m.org>
-    Jeremy Salwen <jeremybubs@gmail.com>
+    50m30n3 <someone@d00m.org>
+    Jeremy Salwen <jeremysalwen@gmail.com>
 
 Copyright:
 
@@ -39,7 +39,7 @@ Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
 
 The Debian packaging is:
 
-    Copyright (C) 2010 Jeremy Salwen <jeremybubs@gmail.com>
+    Copyright (C) 2010 Jeremy Salwen <jeremysalwen@gmail.com>
 
 and is licensed under the GPL version 3, see above.
 
