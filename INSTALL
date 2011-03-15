@@ -1,0 +1,19 @@
+To install this package, you need a C99 compliant compiler, and the LV2 headers
+installed on your system.
+
+To install on a Debian-based system (Ubuntu, this means you!), you should should
+run 
+
+dpkg-buildpackage
+
+from this directory.  This will build a .deb file in the parent directory.  This
+can be installed with 
+
+sudo dpkg -i ../blah.deb
+
+If you're not on a debian based system, just run
+
+make
+sudo make install
+
+Or use your system-specific packaging mechanism, if you know how to do that.
