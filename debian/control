@@ -2,7 +2,7 @@ Source: so-synth-lv2
 Priority: extra
 Maintainer: Jeremy Salwen <jeremysalwen@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~), lv2core
-Standards-Version: 3.8.4
+Standards-Version: 3.9.2
 Section: sound
 Homepage: http://d00m.org/~someone/
 Vcs-Git: git://github.com/jeremysalwen/So-synth-LV2.git
