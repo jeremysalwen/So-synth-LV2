@@ -1,5 +1,6 @@
-so-synth-lv2 (1-1) unstable; urgency=low
+so-synth-lv2 (1-2) unstable; urgency=low
 
+  * fixed up copyright and License headers
   * Initial release (Closes: #608848)
 
  -- Jeremy Salwen <jeremysalwen@gmail.com>  Mon, 14 Mar 2011 20:37:36 -0400
