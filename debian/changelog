@@ -1,4 +1,4 @@
-so-synth-lv2 (1-2) unstable; urgency=low
+so-synth-lv2 (1.1-1) unstable; urgency=low
 
   * fixed up copyright and License headers
   * Initial release (Closes: #608848)
