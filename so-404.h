@@ -21,9 +21,9 @@
 
 #include <lv2.h>
 #include <string.h>
-#include "event-helpers.h"
-#include "uri-map.h"
-#include <stdio.h>	
+#include "lv2/lv2plug.in/ns/ext/event/event-helpers.h"
+#include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
