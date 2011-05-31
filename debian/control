@@ -9,7 +9,6 @@ Vcs-Git: git://github.com/jeremysalwen/So-synth-LV2.git
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/so-666.git;a=summary
 
 Package: so-synth-lv2
-Section: sound
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: A set of synthesizers for the LV2 plugin format
