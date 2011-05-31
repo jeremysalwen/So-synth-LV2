@@ -1,7 +1,7 @@
 Source: so-synth-lv2
 Priority: extra
 Maintainer: Jeremy Salwen <jeremysalwen@gmail.com>
-Build-Depends: debhelper (>= 7.0.50~), lv2core
+Build-Depends: debhelper (>= 7.0.50~), lv2core, lv2-extensions-good, pkg-config
 Standards-Version: 3.9.2
 Section: sound
 Homepage: http://d00m.org/~someone/
