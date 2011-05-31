@@ -27,7 +27,7 @@ clean :
 install :
 	mkdir -p $(INSTALLDIR)$(INSTALLNAME)
 	install $(LIBRARY) $(INSTALLDIR)$(INSTALLNAME)
-	install $(TTLS) $(INSTALLDIR)$(INSTALLNAME)
+	install -m 644 $(TTLS) $(INSTALLDIR)$(INSTALLNAME)
 
 uninstall :
 	rm -rf $(INSTALLDIR)$(INSTALLNAME)
