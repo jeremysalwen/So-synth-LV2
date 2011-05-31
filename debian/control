@@ -1,0 +1,20 @@
+Source: so-synth-lv2
+Priority: extra
+Maintainer: Jeremy Salwen <jeremysalwen@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), lv2core, lv2-extensions-good, pkg-config
+Standards-Version: 3.9.2
+Section: sound
+Homepage: http://d00m.org/~someone/
+Vcs-Git: git://github.com/jeremysalwen/So-synth-LV2.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/so-666.git;a=summary
+
+Package: so-synth-lv2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Provides: lv2-plugin
+Description: Set of synthesizers for the LV2 plugin format
+ This package is an unofficial port of a set of synthesizers
+ written by 50m30n3 to the LV2 plugin format.  In order to use
+ it, you need a host for LV2 plugins such as Ardour, Qtractor,
+ or Ingen.  This package contains three synthesizers, a feedback
+ drone synthesizer, a piano synthesizer, and a bassline synthesizer.
