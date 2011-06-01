@@ -10,6 +10,7 @@ Vcs-Git: git://github.com/jeremysalwen/So-synth-LV2.git
 
 Package: so-synth-lv2
 Architecture: any
+Provides: lv2-plugin
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Set of synthesizers for the LV2 plugin format
  This package is an unofficial port of a set of synthesizers
