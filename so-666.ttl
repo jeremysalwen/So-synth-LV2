@@ -1,0 +1,87 @@
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix ev: <http://lv2plug.in/ns/ext/event#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+<urn:50m30n3:plugins:SO-666> a lv2:Plugin ;
+	a lv2:InstrumentPlugin;
+    doap:name "SO-666 Feedback Synthesizer" ;
+    doap:license <http://usefulinc.com/doap/licenses/gpl> ;
+	lv2:requiredFeature <http://lv2plug.in/ns/ext/event> ;
+    lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;
+	lv2:optionalFeature lv2:hardRtCapable ;
+	
+    lv2:port [
+    a lv2:AudioPort ;
+    a lv2:OutputPort ;
+    lv2:index 0 ;
+    lv2:symbol "output" ;
+    lv2:name "Output" ;
+    ] , [
+    a lv2:InputPort;
+    a ev:EventPort;
+    lv2:index 1 ;
+    ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent>;
+    lv2:symbol "midi";
+    lv2:name "MIDI Input";
+    ], [
+    a lv2:InputPort;
+    a lv2:ControlPort;
+    lv2:index 2;
+    lv2:symbol "controlmode";
+    lv2:name "Control Mode";
+    lv2:portProperty lv2:toggled;
+    lv2:portProperty lv2:enumeration;
+    lv2:default 0;
+    lv2:scalePoint [ rdfs:label "Control Ports"; rdf:value 1 ];
+    lv2:scalePoint [ rdfs:label "Midi Commands"; rdf:value 0 ];
+    ],[
+    a lv2:InputPort;
+    a lv2:ControlPort;
+    lv2:index 3;
+    lv2:symbol "feedback";
+    lv2:name "Feedback";
+    lv2:default 0.25;
+    lv2:minimum 0;
+    lv2:maximum 1;
+    ],[
+    a lv2:InputPort;
+    a lv2:ControlPort;
+    lv2:index 4;
+    lv2:symbol "resonance";
+    lv2:name "Filter Resonance";
+    lv2:default 0.5;
+    lv2:minimum 0;
+    lv2:maximum 1;
+    ],[
+    a lv2:InputPort;
+    a lv2:ControlPort;
+    lv2:index 5;
+    lv2:symbol "cutoff";
+    lv2:name "Filter Cutoff";
+    lv2:default 0.57;
+    lv2:minimum 0.25;
+    lv2:maximum 0.885;
+    ],[
+    a lv2:InputPort;
+    a lv2:ControlPort;
+    lv2:index 6;
+    lv2:symbol "volume";
+    lv2:name "Volume";
+    lv2:default 100;
+    lv2:minimum 0;
+    lv2:maximum 127;
+    ],[
+    a lv2:InputPort;
+    a lv2:ControlPort;
+    lv2:index 7;
+    lv2:symbol "channel";
+    lv2:name "Midi Channel";
+    lv2:portProperty lv2:integer;
+    lv2:default 0;
+    lv2:minimum 0;
+    lv2:maximum 16;
+    lv2:scalePoint [ rdfs:label "Off"; rdf:value 16 ];
+    ].
