@@ -2,7 +2,10 @@ Source: so-synth-lv2
 Priority: extra
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Jeremy Salwen <jeremysalwen@gmail.com>
-Build-Depends: debhelper (>= 7.0.50~), lv2core, lv2-extensions-good, pkg-config
+Build-Depends: debhelper (>= 7.0.50~),
+ lv2core,
+ lv2-extensions-good,
+ pkg-config
 Standards-Version: 3.9.2
 Section: sound
 Homepage: http://d00m.org/~someone/
@@ -11,7 +14,8 @@ Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/so-synth-lv2.git
 
 Package: so-synth-lv2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends},
+ ${misc:Depends}
 Provides: lv2-plugin
 Description: Set of synthesizers for the LV2 plugin format
  This package is an unofficial port of a set of synthesizers
