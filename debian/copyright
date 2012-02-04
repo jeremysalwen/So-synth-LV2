@@ -5,7 +5,7 @@ This work was packaged for Debian by:
 It was downloaded from:
 
     http://d00m.org/~someone/
-    
+
 The LV2 repackaging comes from:
     https://github.com/jeremysalwen/SO-synth-LV2
 
@@ -43,4 +43,3 @@ The Debian packaging is:
     Copyright (C) 2011 Jeremy Salwen <jeremysalwen@gmail.com>
 
 and is licensed under the GPL version 3, see above.
-
