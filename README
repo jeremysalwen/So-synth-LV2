@@ -1,4 +1,4 @@
-LV2 ports by Jeremy Salwen 2010
+LV2 ports by Jeremy Salwen 2010-20011
 
 This is a package of three LV2 plugin synthesizers.  To use them, you need an
 LV2 host which works with MIDI synthesizers.  The different parameters (listed
@@ -47,7 +47,7 @@ CC#74	-	Filter Cutoff
 Sustain can be controlled by CC#1 (Mod Wheel) and CC#64 (Sustain) to make
 control easier for people without a sustain pedal.
 
-*******SO-404 v.1.0 by 50m30n3 2009*******
+*******SO-404 v.1.2 by 50m30n3 2009-2011*******
 
 SO-404 is a simple bass synthesizer using 1 oscillator and 1 filter.
 The oscillator is a simple saw wave oscillator and the filter is a simple
@@ -63,5 +63,6 @@ CC#74	-	Filter Cutoff
 CC#79	-	Filter Envelope
 
 If two notes are played together the pitch will slide according to the
-portamento time. Filter cutoff and note volume are influenced by the MIDI
-note velocity.
+portamento time. Filter cutoff is influenced by the MIDI note velocity.
+A note velocity above 100 generates an accented note where the amp EG is
+replaced by the filter EG.

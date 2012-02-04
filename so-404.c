@@ -58,13 +58,18 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 							if( so->noteson == 0 )
 							{
 								so->freq = so->tfreq;
-								so->amp = ((float)evt[2])/127.0;
+								so->amp=1.0;
+								so->vel = ((float)evt[2]);
+								so->env=so->vel/127.0;
 								so->cdelay = 0;
 							}
 							so->noteson += 1;
 						}
 						else if((evt[0]&MIDI_COMMANDMASK)==MIDI_NOTEOFF )	{
 							so->noteson -= 1;
+							if(so->noteson<0) {
+								so->noteson=0;
+							}
 						}
 						else if((*so->controlmode_p<=0) && (evt[0]&MIDI_COMMANDMASK)==MIDI_CONTROL )	{
 							unsigned int command_val=evt[2];
@@ -97,16 +102,16 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 		if( so->cdelay <= 0 )
 		{
 			so->freq = ((so->portamento/127.0)*0.9)*so->freq + (1.0-((so->portamento/127.0)*0.9))*so->tfreq;
-			if( so->noteson > 0 )
-				so->amp *= 0.8+(so->release/127.0)/5.1;
-			else
+			if( so->noteson > 0 ) {
+				so->amp *= 0.99;
+			} else {
 				so->amp *= 0.5;
-			so->fcutoff = powf(so->cutoff/127.0,5.0)+so->amp*so->amp*powf(so->envmod/128.0,2.0);
-			if( so->fcutoff > 1.0 ) {
-				so->fcutoff = 1.0;
 			}
-			so->fcutoff = sin(so->fcutoff*M_PI/2.0);
-			so->freso = powf(so->resonance/127.0,0.25);
+			so->env*=0.8+powf(so->release/127.0,0.25)/5.1;
+
+			so->fcutoff = powf(so->cutoff/127.0,2.0)+powf(so->env,2.0)*powf(so->envmod/127.0,2.0);
+			so->fcutoff = tanh(so->fcutoff);
+			so->freso = powf(so->resonance/130.0,0.25);
 			so->cdelay = so->samplerate/100;
 		}
 		so->cdelay--;
@@ -114,10 +119,15 @@ void runSO_404( LV2_Handle arg, uint32_t nframes ) {
 		float max = so->samplerate / so->freq;
 		float sample = (so->phase/max)*(so->phase/max)-0.25;
 		so->phase++;
-		if( so->phase >= max )
-		so->phase -= max;
+		if( so->phase >= max ) {
+			so->phase -= max;
+		}
 		
-		sample *= so->amp;
+		if(so->vel>100) {
+			sample*=so->env;
+		} else {
+			sample*=so->amp;
+		}
 
 		so->fpos += so->fspeed;
 		so->fspeed *= so->freso;
@@ -147,12 +157,14 @@ LV2_Handle instantiateSO_404(const LV2_Descriptor *descriptor,double s_rate, con
 															                                                                             }
 	}
 
-	puts( "SO-404 v.1.0 by 50m30n3 2009" );
+	puts( "SO-404 v.1.2 by 50m30n3 2009-2011" );
 		
 	so->phase = 0.0;
 	so->freq = 440.0;
 	so->tfreq = 440.0;
 	so->amp = 0.0;
+	so->env=0.0;
+	so->vel=0;
 	so->fcutoff = 0.0;
 	so->fspeed = 0.0;
 	so->fpos = 0.0;
