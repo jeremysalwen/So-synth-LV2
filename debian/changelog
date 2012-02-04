@@ -1,3 +1,11 @@
+so-synth-lv2 (1.4-1) unstable; urgency=low
+
+  * Team upload.
+  * Moving under the umbrella of the Debian Multimedia Maintainers team.
+  * New upstream release.
+
+ -- Alessio Treglia <alessio@debian.org>  Sat, 04 Feb 2012 22:50:36 +0100
+
 so-synth-lv2 (1.3-1) unstable; urgency=low
 
   * Initial release (Closes: #608848)
