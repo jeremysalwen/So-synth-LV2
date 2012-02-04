@@ -96,10 +96,12 @@ typedef struct so_404_t {
 	unsigned int portamento;
 	unsigned int release;
 	unsigned int envmod;
+	unsigned int vel;
 
 	float phase;
 	float amp;
 	float lastsample;
+	float env;
 	
 	float fcutoff;
 	float fspeed;
