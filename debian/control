@@ -7,7 +7,7 @@ Build-Depends:
  debhelper (>= 7.0.50~),
  lv2-dev,
  pkg-config
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 Section: sound
 Homepage: http://d00m.org/~someone/
 Vcs-Git: git://git.debian.org/pkg-multimedia/so-synth-lv2.git
