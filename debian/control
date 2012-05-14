@@ -5,8 +5,7 @@ Uploaders:
  Jeremy Salwen <jeremysalwen@gmail.com>
 Build-Depends:
  debhelper (>= 7.0.50~),
- lv2-extensions-good,
- lv2core,
+ lv2-dev,
  pkg-config
 Standards-Version: 3.9.2
 Section: sound
