@@ -1,3 +1,11 @@
+so-synth-lv2 (1.4-2) unstable; urgency=low
+
+  * Team upload.
+  * Port to the LV2's first stable spec.
+  * Bump Standards.
+
+ -- Alessio Treglia <alessio@debian.org>  Mon, 14 May 2012 20:47:44 +0200
+
 so-synth-lv2 (1.4-1) unstable; urgency=low
 
   * Team upload.
