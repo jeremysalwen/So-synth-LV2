@@ -10,8 +10,8 @@ Build-Depends:
 Standards-Version: 3.9.3
 Section: sound
 Homepage: http://d00m.org/~someone/
-Vcs-Git: git://git.debian.org/pkg-multimedia/so-synth-lv2.git
-Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/so-synth-lv2.git
+Vcs-Git: https://salsa.debian.org/multimedia-team/so-synth-lv2.git
+Vcs-Browser: https://salsa.debian.org/multimedia-team/so-synth-lv2
 
 Package: so-synth-lv2
 Architecture: any
