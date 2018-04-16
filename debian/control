@@ -1,6 +1,6 @@
 Source: so-synth-lv2
 Priority: optional
-Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
+Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
 Uploaders:
  Jeremy Salwen <jeremysalwen@gmail.com>
 Build-Depends:
