@@ -1,4 +1,4 @@
-LV2 ports by Jeremy Salwen 2010-20011
+LV2 ports by Jeremy Salwen 2010-2020
 
 This is a package of three LV2 plugin synthesizers.  To use them, you need an
 LV2 host which works with MIDI synthesizers.  The different parameters (listed

@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2011 - Jeremy Salwen
  * Copyright (C) 2010 - 50m30n3
+ * Copyright (C) 2020 - Google LLC
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +24,7 @@
 inline float sustain_scale(float input) { return 0.6 + powf(input, 0.4) * 0.4; }
 void runSO_kl5(LV2_Handle arg, uint32_t nframes) {
   so_kl5* so = (so_kl5*)arg;
-  lv2_event_begin(&so->in_iterator, so->MidiIn);
+  LV2_Atom_Event* iter = lv2_atom_sequence_begin(&so->midi_p->body);
 
   float** strings = so->strings;
   unsigned int* stringpos = so->stringpos;
@@ -45,108 +46,104 @@ void runSO_kl5(LV2_Handle arg, uint32_t nframes) {
   }
 
   for (i = 0; i < nframes; i++) {
-    while (lv2_event_is_valid(&so->in_iterator)) {
-      uint8_t* data;
-      LV2_Event* event = lv2_event_get(&so->in_iterator, &data);
-      if (event->type == 0) {
-        so->event_ref->lv2_event_unref(so->event_ref->callback_data, event);
-      } else if (event->type == so->midi_event_id) {
-        if (event->frames > i) {
-          break;
-        } else {
-          const uint8_t* evt = (uint8_t*)data;
-          if ((evt[0] & MIDI_CHANNELMASK) == (int)(*so->channel_p)) {
-            if ((evt[0] & MIDI_COMMANDMASK) == MIDI_NOTEON) {
-              note = evt[1];
-              if ((note >= BASENOTE) && (note < BASENOTE + NUMNOTES)) {
-                note -= BASENOTE;
+    while (!lv2_atom_sequence_is_end(&so->midi_p->body, so->midi_p->atom.size,
+                                     iter)) {
+      if (iter->time.frames > i) {
+        break;
+      }
+      if (iter->body.type == so->uris.midi_MidiEvent) {
+        const uint8_t* evt = (uint8_t*)(iter + 1);
+        if ((evt[0] & MIDI_CHANNELMASK) == (int)(*so->channel_p)) {
+          if ((evt[0] & MIDI_COMMANDMASK) == MIDI_NOTEON) {
+            note = evt[1];
+            if ((note >= BASENOTE) && (note < BASENOTE + NUMNOTES)) {
+              note -= BASENOTE;
 
-                status[note] = 1;
+              status[note] = 1;
 
-                int j;
-                for (j = 0; j < stringlength[note]; j++) {
-                  tempstring[j] = ((float)rand() / (float)RAND_MAX) * 2.0 - 1.0;
-                }
-                float velocity = evt[2];
-                float freq = stringcutoff[note] * 0.25 +
-                             velocity / 127.0 * 0.2 + so->sattack + 0.1;
+              int j;
+              for (j = 0; j < stringlength[note]; j++) {
+                tempstring[j] = ((float)rand() / (float)RAND_MAX) * 2.0 - 1.0;
+              }
+              float velocity = evt[2];
+              float freq = stringcutoff[note] * 0.25 + velocity / 127.0 * 0.2 +
+                           so->sattack + 0.1;
 
-                for (j = 0; j < 30; j++) {
-                  tempstring[0] =
-                      tempstring[0] * freq +
-                      tempstring[stringlength[note] - 1] * (1.0 - freq);
-                  int k;
-                  for (k = 1; k < stringlength[note]; k++) {
-                    tempstring[k] =
-                        tempstring[k] * freq +
-                        tempstring[(k - 1) % stringlength[note]] * (1.0 - freq);
-                  }
-                }
-
-                float avg = 0.0;
-
-                for (j = 0; j < stringlength[note]; j++) {
-                  avg += tempstring[j];
-                }
-
-                avg /= stringlength[note];
-
-                float scale = 0.0;
-
-                for (j = 0; j < stringlength[note]; j++) {
-                  tempstring[j] -= avg;
-                  if (fabs(tempstring[j]) > scale) scale = fabs(tempstring[j]);
-                }
-
-                float min = 10.0;
-                int minpos = 0;
-
-                for (j = 0; j < stringlength[note]; j++) {
-                  tempstring[j] /= scale;
-                  if (fabs(tempstring[j]) +
-                          fabs(tempstring[j] - tempstring[j - 1]) * 5.0 <
-                      min) {
-                    min = fabs(tempstring[j]) +
-                          fabs(tempstring[j] - tempstring[j - 1]) * 5.0;
-                    minpos = j;
-                  }
-                }
-
-                float vol = velocity / 256.0;
-
-                for (j = 0; j < stringlength[note]; j++) {
-                  strings[note][(stringpos[note] + j) % stringlength[note]] +=
-                      tempstring[(j + minpos) % stringlength[note]] * vol;
+              for (j = 0; j < 30; j++) {
+                tempstring[0] =
+                    tempstring[0] * freq +
+                    tempstring[stringlength[note] - 1] * (1.0 - freq);
+                int k;
+                for (k = 1; k < stringlength[note]; k++) {
+                  tempstring[k] =
+                      tempstring[k] * freq +
+                      tempstring[(k - 1) % stringlength[note]] * (1.0 - freq);
                 }
               }
-            } else if ((evt[0] & MIDI_COMMANDMASK) == MIDI_NOTEOFF) {
-              note = evt[1];
-              if ((note >= BASENOTE) && (note < BASENOTE + NUMNOTES)) {
-                note -= BASENOTE;
-                status[note] = 0;
+
+              float avg = 0.0;
+
+              for (j = 0; j < stringlength[note]; j++) {
+                avg += tempstring[j];
               }
-            } else if ((*so->controlmode_p <= 0) &&
-                       (evt[0] & MIDI_COMMANDMASK) == MIDI_CONTROL) {
-              if (evt[1] == 74) {
-                unsigned int cutoff = evt[2];
-                so->fcutoff = (cutoff + 5.0) / 400.0;
-              } else if (evt[1] == 71) {
-                unsigned int resonance = evt[2];
-                so->freso = (resonance / 140.0) * (1.0 - so->fcutoff);
-              } else if (evt[1] == 73) {
-                unsigned int attack = evt[2];
-                so->sattack = (attack + 5.0) / 800.0;
-              } else if (evt[1] == 7) {
-                so->volume = evt[2];
-              } else if (evt[1] == 1 || evt[1] == 64) {
-                unsigned int sustain = evt[2];
-                so->ssustain = sustain_scale(sustain / 127.0);
+
+              avg /= stringlength[note];
+
+              float scale = 0.0;
+
+              for (j = 0; j < stringlength[note]; j++) {
+                tempstring[j] -= avg;
+                if (fabs(tempstring[j]) > scale) scale = fabs(tempstring[j]);
               }
+
+              float min = 10.0;
+              int minpos = 0;
+
+              for (j = 0; j < stringlength[note]; j++) {
+                tempstring[j] /= scale;
+                if (fabs(tempstring[j]) +
+                        fabs(tempstring[j] - tempstring[j - 1]) * 5.0 <
+                    min) {
+                  min = fabs(tempstring[j]) +
+                        fabs(tempstring[j] - tempstring[j - 1]) * 5.0;
+                  minpos = j;
+                }
+              }
+
+              float vol = velocity / 256.0;
+
+              for (j = 0; j < stringlength[note]; j++) {
+                strings[note][(stringpos[note] + j) % stringlength[note]] +=
+                    tempstring[(j + minpos) % stringlength[note]] * vol;
+              }
+            }
+          } else if ((evt[0] & MIDI_COMMANDMASK) == MIDI_NOTEOFF) {
+            note = evt[1];
+            if ((note >= BASENOTE) && (note < BASENOTE + NUMNOTES)) {
+              note -= BASENOTE;
+              status[note] = 0;
+            }
+          } else if ((*so->controlmode_p <= 0) &&
+                     (evt[0] & MIDI_COMMANDMASK) == MIDI_CONTROL) {
+            if (evt[1] == 74) {
+              unsigned int cutoff = evt[2];
+              so->fcutoff = (cutoff + 5.0) / 400.0;
+            } else if (evt[1] == 71) {
+              unsigned int resonance = evt[2];
+              so->freso = (resonance / 140.0) * (1.0 - so->fcutoff);
+            } else if (evt[1] == 73) {
+              unsigned int attack = evt[2];
+              so->sattack = (attack + 5.0) / 800.0;
+            } else if (evt[1] == 7) {
+              so->volume = evt[2];
+            } else if (evt[1] == 1 || evt[1] == 64) {
+              unsigned int sustain = evt[2];
+              so->ssustain = sustain_scale(sustain / 127.0);
             }
           }
         }
       }
-      lv2_event_increment(&so->in_iterator);
+      iter = lv2_atom_sequence_next(iter);
     }
     sample = 0.0;
 
@@ -193,16 +190,11 @@ LV2_Handle instantiateSO_kl5(const LV2_Descriptor* descriptor, double s_rate,
                              const char* path,
                              const LV2_Feature* const* features) {
   so_kl5* so = malloc(sizeof(so_kl5));
-  LV2_URI_Map_Feature* map_feature;
-  const LV2_Feature* const* ft;
-  for (ft = features; *ft; ft++) {
-    if (!strcmp((*ft)->URI, "http://lv2plug.in/ns/ext/uri-map")) {
-      map_feature = (*ft)->data;
-      so->midi_event_id = map_feature->uri_to_id(
-          map_feature->callback_data, "http://lv2plug.in/ns/ext/event",
-          "http://lv2plug.in/ns/ext/midi#MidiEvent");
-    } else if (!strcmp((*ft)->URI, "http://lv2plug.in/ns/ext/event")) {
-      so->event_ref = (*ft)->data;
+  for (int i = 0; features[i]; ++i) {
+    if (!strcmp(features[i]->URI, LV2_URID__map)) {
+      LV2_URID_Map* map = (LV2_URID_Map*)features[i]->data;
+      so->uris.midi_MidiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
+      break;
     }
   }
 
@@ -271,7 +263,7 @@ void connectPortSO_kl5(LV2_Handle instance, uint32_t port,
       so->output = data_location;
       break;
     case KL5_PORT_MIDI:
-      so->MidiIn = data_location;
+      so->midi_p = data_location;
       break;
     case KL5_PORT_CONTROLMODE:
       so->controlmode_p = data_location;

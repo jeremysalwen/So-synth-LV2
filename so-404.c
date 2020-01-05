@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2011 - Jeremy Salwen
  * Copyright (C) 2010 - 50m30n3
+ * Copyright (C) 2020 - Google LLC
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +27,8 @@ inline float midi_to_hz(int note) {
 
 void runSO_404(LV2_Handle arg, uint32_t nframes) {
   so_404* so = (so_404*)arg;
-  lv2_event_begin(&so->in_iterator, so->MidiIn);
+
+  LV2_Atom_Event* iter = lv2_atom_sequence_begin(&so->midi_p->body);
 
   float* outbuffer = so->output;
 
@@ -41,61 +43,57 @@ void runSO_404(LV2_Handle arg, uint32_t nframes) {
 
   int i;
   for (i = 0; i < nframes; i++) {
-    while (lv2_event_is_valid(&so->in_iterator)) {
-      uint8_t* data;
-      LV2_Event* event = lv2_event_get(&so->in_iterator, &data);
-      if (event->type == 0) {
-        so->event_ref->lv2_event_unref(so->event_ref->callback_data, event);
-      } else if (event->type == so->midi_event_id) {
-        if (event->frames > i) {
-          break;
-        } else {
-          const uint8_t* evt = (uint8_t*)data;
-          if ((evt[0] & MIDI_CHANNELMASK) == (int)(*so->channel_p)) {
-            if ((evt[0] & MIDI_COMMANDMASK) == MIDI_NOTEON) {
-              unsigned int note = evt[1];
-              so->tfreq = midi_to_hz(note);
-              if (so->noteson == 0) {
-                so->freq = so->tfreq;
-                so->amp = 1.0;
-                so->vel = ((float)evt[2]);
-                so->env = so->vel / 127.0;
-                so->cdelay = 0;
-              }
-              so->noteson += 1;
-            } else if ((evt[0] & MIDI_COMMANDMASK) == MIDI_NOTEOFF) {
-              so->noteson -= 1;
-              if (so->noteson < 0) {
-                so->noteson = 0;
-              }
-            } else if ((*so->controlmode_p <= 0) &&
-                       (evt[0] & MIDI_COMMANDMASK) == MIDI_CONTROL) {
-              unsigned int command_val = evt[2];
-              switch (evt[1]) {
-                case 74:
-                  so->cutoff = command_val;
-                  break;
-                case 65:
-                  so->portamento = command_val;
-                  break;
-                case 72:
-                  so->release = command_val;
-                  break;
-                case 7:
-                  so->volume = command_val;
-                  break;
-                case 79:
-                  so->envmod = command_val;
-                  break;
-                case 71:
-                  so->resonance = command_val;
-                  break;
-              }
+    while (!lv2_atom_sequence_is_end(&so->midi_p->body, so->midi_p->atom.size,
+                                     iter)) {
+      if (iter->time.frames > i) {
+        break;
+      }
+      if (iter->body.type == so->uris.midi_MidiEvent) {
+        const uint8_t* evt = (uint8_t*)(iter + 1);
+        if ((evt[0] & MIDI_CHANNELMASK) == (int)(*so->channel_p)) {
+          if ((evt[0] & MIDI_COMMANDMASK) == MIDI_NOTEON) {
+            unsigned int note = evt[1];
+            so->tfreq = midi_to_hz(note);
+            if (so->noteson == 0) {
+              so->freq = so->tfreq;
+              so->amp = 1.0;
+              so->vel = ((float)evt[2]);
+              so->env = so->vel / 127.0;
+              so->cdelay = 0;
+            }
+            so->noteson += 1;
+          } else if ((evt[0] & MIDI_COMMANDMASK) == MIDI_NOTEOFF) {
+            so->noteson -= 1;
+            if (so->noteson < 0) {
+              so->noteson = 0;
+            }
+          } else if ((*so->controlmode_p <= 0) &&
+                     (evt[0] & MIDI_COMMANDMASK) == MIDI_CONTROL) {
+            unsigned int command_val = evt[2];
+            switch (evt[1]) {
+              case 74:
+                so->cutoff = command_val;
+                break;
+              case 65:
+                so->portamento = command_val;
+                break;
+              case 72:
+                so->release = command_val;
+                break;
+              case 7:
+                so->volume = command_val;
+                break;
+              case 79:
+                so->envmod = command_val;
+                break;
+              case 71:
+                so->resonance = command_val;
+                break;
             }
           }
         }
       }
-      lv2_event_increment(&so->in_iterator);
+      iter = lv2_atom_sequence_next(iter);
     }
     if (so->cdelay <= 0) {
       so->freq = ((so->portamento / 127.0) * 0.9) * so->freq +
@@ -144,16 +142,11 @@ LV2_Handle instantiateSO_404(const LV2_Descriptor* descriptor, double s_rate,
                              const char* path,
                              const LV2_Feature* const* features) {
   so_404* so = malloc(sizeof(so_404));
-  LV2_URI_Map_Feature* map_feature;
-  const LV2_Feature* const* ft;
-  for (ft = features; *ft; ft++) {
-    if (!strcmp((*ft)->URI, "http://lv2plug.in/ns/ext/uri-map")) {
-      map_feature = (*ft)->data;
-      so->midi_event_id = map_feature->uri_to_id(
-          map_feature->callback_data, "http://lv2plug.in/ns/ext/event",
-          "http://lv2plug.in/ns/ext/midi#MidiEvent");
-    } else if (!strcmp((*ft)->URI, "http://lv2plug.in/ns/ext/event")) {
-      so->event_ref = (*ft)->data;
+  for (int i = 0; features[i]; ++i) {
+    if (!strcmp(features[i]->URI, LV2_URID__map)) {
+      LV2_URID_Map* map = (LV2_URID_Map*)features[i]->data;
+      so->uris.midi_MidiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
+      break;
     }
   }
 
@@ -192,7 +185,7 @@ void connectPortSO_404(LV2_Handle instance, uint32_t port,
       so->output = data_location;
       break;
     case PORT_404_MIDI:
-      so->MidiIn = data_location;
+      so->midi_p = data_location;
       break;
     case PORT_404_CONTROLMODE:
       so->controlmode_p = data_location;

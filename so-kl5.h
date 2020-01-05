@@ -4,6 +4,7 @@
  *
  * Copyright (C) 2011 - Jeremy Salwen
  * Copyright (C) 2010 - 50m30n3
+ * Copyright (C) 2020 - Google LLC
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +27,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "lv2/lv2plug.in/ns/ext/event/event-helpers.h"
-#include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
+#include "lv2/lv2plug.in/ns/ext/atom/atom.h"
+#include "lv2/lv2plug.in/ns/ext/atom/util.h"
+#include "lv2/lv2plug.in/ns/ext/midi/midi.h"
+#include "lv2/lv2plug.in/ns/ext/urid/urid.h"
 
 #define NUMNOTES 80
 #define BASENOTE 21
@@ -71,12 +74,12 @@ static LV2_Descriptor so_kl5_Descriptor = {
 
 typedef struct so_kl5_t {
   float* output;
-  LV2_Event_Buffer* MidiIn;
-  LV2_Event_Iterator in_iterator;
 
-  LV2_Event_Feature* event_ref;
-  int midi_event_id;
+  struct {
+    LV2_URID midi_MidiEvent;
+  } uris;
 
+  const LV2_Atom_Sequence* midi_p;
   float* controlmode_p;
   float* volume_p;
   float* resonance_p;
