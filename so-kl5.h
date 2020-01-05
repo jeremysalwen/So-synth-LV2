@@ -20,13 +20,14 @@
  */
 
 #include <lv2.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
 #include "lv2/lv2plug.in/ns/ext/event/event-helpers.h"
 #include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
-#include <stdio.h>	
-#include <stdlib.h>
-#include <unistd.h>
-#include <math.h>
 
 #define NUMNOTES 80
 #define BASENOTE 21
@@ -39,60 +40,62 @@
 #define MIDI_CONTROL 0xB0
 
 enum KL5_PORTS {
-	KL5_PORT_OUTPUT=0,
-	KL5_PORT_MIDI,
-	KL5_PORT_CONTROLMODE,
-	KL5_PORT_SUSTAIN,
-	KL5_PORT_RESONANCE,
-	KL5_PORT_CUTOFF,
-	KL5_PORT_ATTACK,
-	KL5_PORT_VOLUME,
-	KL5_PORT_CHANNEL
+  KL5_PORT_OUTPUT = 0,
+  KL5_PORT_MIDI,
+  KL5_PORT_CONTROLMODE,
+  KL5_PORT_SUSTAIN,
+  KL5_PORT_RESONANCE,
+  KL5_PORT_CUTOFF,
+  KL5_PORT_ATTACK,
+  KL5_PORT_VOLUME,
+  KL5_PORT_CHANNEL
 };
 
-void runSO_kl5( LV2_Handle arg, uint32_t nframes );
-LV2_Handle instantiateSO_kl5(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
+void runSO_kl5(LV2_Handle arg, uint32_t nframes);
+LV2_Handle instantiateSO_kl5(const LV2_Descriptor* descriptor, double s_rate,
+                             const char* path,
+                             const LV2_Feature* const* features);
 void cleanupSO_kl5(LV2_Handle instance);
-void connectPortSO_kl5(LV2_Handle instance, uint32_t port, void *data_location);
+void connectPortSO_kl5(LV2_Handle instance, uint32_t port, void* data_location);
 
-static LV2_Descriptor so_kl5_Descriptor= {
-	.URI="urn:50m30n3:plugins:SO-kl5",
-	.instantiate=instantiateSO_kl5,
-	.connect_port=connectPortSO_kl5,
-	.activate=NULL,
-	.run=runSO_kl5,
-	.deactivate=NULL,
-	.cleanup=cleanupSO_kl5,
-	.extension_data=NULL,
+static LV2_Descriptor so_kl5_Descriptor = {
+    .URI = "urn:50m30n3:plugins:SO-kl5",
+    .instantiate = instantiateSO_kl5,
+    .connect_port = connectPortSO_kl5,
+    .activate = NULL,
+    .run = runSO_kl5,
+    .deactivate = NULL,
+    .cleanup = cleanupSO_kl5,
+    .extension_data = NULL,
 };
 
 typedef struct so_kl5_t {
-	float* output;
-	LV2_Event_Buffer *MidiIn;
-	LV2_Event_Iterator in_iterator;
+  float* output;
+  LV2_Event_Buffer* MidiIn;
+  LV2_Event_Iterator in_iterator;
 
-	LV2_Event_Feature* event_ref;
-	int midi_event_id;
-	
-	float* controlmode_p;
-	float* volume_p;
-	float* resonance_p;
-	float* cutoff_p;
-	float* sustain_p;
-	float* attack_p;
-	
-	float *strings[NUMNOTES];
-	unsigned int stringpos[NUMNOTES];
-	unsigned int stringlength[NUMNOTES];
-	float stringcutoff[NUMNOTES];
-	int status[NUMNOTES];
+  LV2_Event_Feature* event_ref;
+  int midi_event_id;
 
-	unsigned int volume;
-	
-	float lpval, lplast;
-	float fcutoff, freso, ssustain,sattack;
+  float* controlmode_p;
+  float* volume_p;
+  float* resonance_p;
+  float* cutoff_p;
+  float* sustain_p;
+  float* attack_p;
 
-	float* channel_p;
+  float* strings[NUMNOTES];
+  unsigned int stringpos[NUMNOTES];
+  unsigned int stringlength[NUMNOTES];
+  float stringcutoff[NUMNOTES];
+  int status[NUMNOTES];
 
-	float* tempstring;
+  unsigned int volume;
+
+  float lpval, lplast;
+  float fcutoff, freso, ssustain, sattack;
+
+  float* channel_p;
+
+  float* tempstring;
 } so_kl5;

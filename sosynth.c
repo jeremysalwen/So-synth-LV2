@@ -18,20 +18,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "so-404.h"
 #include "so-666.h"
 #include "so-kl5.h"
-#include "so-404.h"
 
 LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) {
-	switch(index) {
-		case 0:
-			return &so_666_Descriptor;
-		case 1:
-			return &so_kl5_Descriptor;
-		case 2:
-			return &so_404_Descriptor;
-		default:
-			return NULL;
-	}
+  switch (index) {
+    case 0:
+      return &so_666_Descriptor;
+    case 1:
+      return &so_kl5_Descriptor;
+    case 2:
+      return &so_404_Descriptor;
+    default:
+      return NULL;
+  }
 }
-
