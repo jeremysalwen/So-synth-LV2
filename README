@@ -18,11 +18,27 @@ The following are relevant excerpts from the original synthesizers released by
 
 
 *******SO-666 v.1.0 by 50m30n3 2009*******
+http://d00m.org/~someone/so666/
 
 SO-666 is a feedback based drone synthesizer building upon the SO-KL5 synth.
 It creates haunting cacophonic howls and drones.
 It's a bit hard to play but making good use of the modwheel will help keep the
 sound in control.
+
+***How to play***
+
+Since it can be complicated to get any sound from this thing whatsoever you can try this:
+
+    Turn your modwheel all the way down
+    Press any key, keep it pressed
+    Slowly turn up your modwheel to increase feedback
+    About 2/3 up you should start to hear something
+    Put the modwheel in center position for maximum playability
+    Play some different notes or chords (dissonant intervals work great since they create a lot of low beat frequencies)
+    Twiddle the modwheel, cutoff and resonance for different effects
+    ...
+    Profit!
+
 
 Parameter list:
 CC#1	-	Feedback (mod wheel)
@@ -33,6 +49,7 @@ CC#74	-	Filter Cutoff
 
 
 *******SO-KL5 v.1.1 by 50m30n3 2010*******
+http://d00m.org/~someone/sokl5/
 
 SO-KL5 is a string based "piano" synthezizer. The strings are
 modeled using the Karplus-Strong String simulation method.
@@ -48,6 +65,7 @@ Sustain can be controlled by CC#1 (Mod Wheel) and CC#64 (Sustain) to make
 control easier for people without a sustain pedal.
 
 *******SO-404 v.1.2 by 50m30n3 2009-2011*******
+http://d00m.org/~someone/so404/
 
 SO-404 is a simple bass synthesizer using 1 oscillator and 1 filter.
 The oscillator is a simple saw wave oscillator and the filter is a simple
